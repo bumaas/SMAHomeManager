@@ -1,0 +1,8 @@
+{
+    "elements": [
+        { "type": "CheckBox", "name": "ShowDetailedChannels", "caption": "Show more detailed measurement channels (apparent power, reactive power)" },
+        { "type": "CheckBox", "name": "ShowSinglePhases", "caption": "Show single phases" }
+    ],
+    "actions": [],
+    "status": []
+}

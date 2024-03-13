@@ -1,0 +1,12 @@
+{
+    "id": "{F6ADE925-6B0D-2CD2-C90B-DA5F987F0DB1}",
+    "name": "SMA Home Manager",
+    "author": "bumaas",
+    "url": "",
+    "compatibility": {
+        "version": "7.0"
+    },
+    "version": "0.9",
+    "build": 1,
+    "date": 1710336648
+}
