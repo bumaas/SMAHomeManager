@@ -21,8 +21,8 @@ Das Modul empfängt über ein Multicast Socket die Nachrichten vom SMA Energy Me
 
 ### 3. Software-Installation
 
-* Über den Module Store das 'SMA Home Manager Device'-Modul installieren.
-* Alternativ über das Module Control folgende URL hinzufügen: https://github.com/bumaas/SMAHomeManager
+* Über den Module Store wird das 'SMA Home Manager Device'-Modul installiert.
+* Alternativ kann über das Module Control folgende URL hinzugefügt werden: https://github.com/bumaas/SMAHomeManager
 
 
 ### 4. Einrichten der Instanzen in IP-Symcon
@@ -30,15 +30,17 @@ Das Modul empfängt über ein Multicast Socket die Nachrichten vom SMA Energy Me
  Unter 'Instanz hinzufügen' kann das 'SMA Home Manager Device'-Modul mithilfe des Schnellfilters gefunden werden.  
  Allgemeine Informationen zum Hinzufügen von Instanzen gibt es in der [Dokumentation der Instanzen](https://www.symcon.de/service/dokumentation/konzepte/instanzen/#Instanz_hinzufügen)
 
-__Konfigurationsseite__:
+#### Konfigurationsseite der Geräteinstanz
 
 | Name                                                               | Beschreibung                                                                                                            |
 |--------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
 | Anzeige detaillierterer Messkanäle (Scheinleistung, Blindleistung) | Legt fest, ob neben der Wirkleistung auch die Blind- und Scheinleistung angezeigt werden soll.                          |
 | Anzeige einzelner Phasen                                           | Legt fest, ob zusätzlich zu den Summenwerten auch die Werte der einzelnen Phasen L1, L2 und L3 angezeigt werden sollen. |
 
+#### Konfigurationsseite der IO-Instanz
+
 Beim Anlegen der Geräteinstanz wird automatisch auch der benötigte Multicast Socket angelegt. Er ist wie folgt zu konfigurieren:
-![MulticastSocket.png](imgs%2FMulticastSocket.png)
+![MulticastSocket.png](imgs/MulticastSocket.png)
 
 Als Sende-Host ist der Name oder die IP-Adresse des Home Manager anzugeben, als Empf.-Host der Name oder die IP-Adresse des Symcon Servers. 
 

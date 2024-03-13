@@ -249,7 +249,7 @@ class SMAHomeManagerDevice extends IPSModule
 
     private function RegisterChannelVariable(string $prefix, array $channel, int $position): void
     {
-        if ($this->ReadPropertyBoolean(self::PROP_SHOW_DETAILED_CHANNELS) || !$channel['detail']) {
+        if (!$channel['detail'] || $this->ReadPropertyBoolean(self::PROP_SHOW_DETAILED_CHANNELS)) {
             $ident = $this->getIdent($prefix, $channel['name']);
             $this->SendDebug(sprintf('%s TEST', __FUNCTION__), $ident, 0);
             $this->RegisterVariableFloat($ident, $this->translate($channel['name']), $channel['profile'], $position);
@@ -262,7 +262,7 @@ class SMAHomeManagerDevice extends IPSModule
         return $prefix . preg_replace('/[^a-z0-9_]/i', '_', $name); //alles bis auf a-z, A-Z, 0-9 und '_' durch '_' ersetzen
     }
 
-    public function ApplyChanges()
+    public function ApplyChanges(): void
     {
         $this->RegisterVariables();
 
@@ -272,7 +272,7 @@ class SMAHomeManagerDevice extends IPSModule
         parent::ApplyChanges();
     }
 
-    public function ReceiveData($JSONString)
+    public function ReceiveData($JSONString): void
     {
         $data = json_decode($JSONString, true, 512, JSON_THROW_ON_ERROR);
         $this->SendDebug(
@@ -333,7 +333,7 @@ class SMAHomeManagerDevice extends IPSModule
             //$this->SendDebug(sprintf('%s (%s)', __FUNCTION__, 'id'), $id,0);
 
             //echo $id . PHP_EOL;
-            if (($id === '00000000') || ($id === false)) {
+            if ($id === '00000000') {
                 $finished = true;
                 continue;
             }
@@ -345,7 +345,7 @@ class SMAHomeManagerDevice extends IPSModule
 
             if (isset(self::LIST_SUM[$id])) {
                 $ident = $this->getIdent('SUM_', self::LIST_SUM[$id]['name']);
-                if ($this->ReadPropertyBoolean(self::PROP_SHOW_DETAILED_CHANNELS) || !self::LIST_SUM[$id]['detail']) {
+                if (!self::LIST_SUM[$id]['detail'] || $this->ReadPropertyBoolean(self::PROP_SHOW_DETAILED_CHANNELS)) {
                     $this->SetValue(
                         $ident,
                         base_convert(substr($hraw, $offset * 2, $len * 2), 16, 10) / self::LIST_SUM[$id]['divisor']
@@ -391,21 +391,4 @@ class SMAHomeManagerDevice extends IPSModule
             $offset += $len;
         }
     }
-
-    private function getCorrectedHexString(string $hexString)
-    {
-        $chars_array = str_split($hexString);
-
-        for ($position = 0, $positionMax = count($chars_array); $position < $positionMax; $position += 2) {
-            if ($chars_array[$position] === 'c' && isset($chars_array[$position + 1])
-                && ($chars_array[$position + 1] === '2'
-                    || $chars_array[$position + 1] === '3')) {
-                $chars_array[$position]     = '';
-                $chars_array[$position + 1] = '';
-            }
-        }
-
-        return implode("", $chars_array);
-    }
-
 }
