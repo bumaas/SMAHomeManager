@@ -1,8 +1,8 @@
 {
     "translations": {
         "de": {
-            "Translation 1": "Übersetzung 1",
-            "Translation 2": "Übersetzung 2"
+            "Show more detailed measurement channels (apparent power, reactive power)": "Anzeige detaillierterer Messkanäle (Scheinleistung, Blindleistung)",
+            "Show single phases": "Anzeige einzelner Phasen"
         }
     }
 }
