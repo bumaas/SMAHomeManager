@@ -2,7 +2,17 @@
     "translations": {
         "de": {
             "Show more detailed measurement channels (apparent power, reactive power)": "Anzeige detaillierterer Messkanäle (Scheinleistung, Blindleistung)",
-            "Show single phases": "Anzeige einzelner Phasen"
+            "Show single phases": "Anzeige einzelner Phasen",
+            "Real Power": "Wirkleistung",
+            "Counter Real Power": "Zähler Wirkleistung",
+            "Reaactive Power": "Blindleistung",
+            "Counter Reactive Power": "Zähler Blindleistung",
+            "Apparent Power": "Scheinleistung",
+            "Counter Apparent Power": "Zähler Scheinleistung",
+            "Power Factor": "Leistungsfaktor",
+            "Network Freqeuncy": "Netzfrequenz",
+            "Power": "Strom",
+            "Voltage": "Spannung"
         }
     }
 }

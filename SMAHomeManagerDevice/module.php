@@ -47,7 +47,7 @@ class SMAHomeManagerDevice extends IPSModule
             'name'    => 'Counter Apparent Power -',
             'detail'  => true
         ],
-        '000d0400' => ['OBIS' => '1340', 'divisor' => 1000, 'profile' => '', 'name' => 'Power Faktor', 'detail' => true],
+        '000d0400' => ['OBIS' => '1340', 'divisor' => 1000, 'profile' => '', 'name' => 'Power Factor', 'detail' => true],
         '000e0400' => ['OBIS' => '1440', 'divisor' => 1000, 'profile' => '~Hertz.50', 'name' => 'Network Frequency', 'detail' => true]
     ];
 
@@ -102,7 +102,7 @@ class SMAHomeManagerDevice extends IPSModule
                               ],
                               '001f0400' => ['OBIS' => '3140', 'divisor' => 1000, 'profile' => '~Ampere', 'name' => 'Power', 'detail' => true],
                               '00200400' => ['OBIS' => '3240', 'divisor' => 1000, 'profile' => '~Volt.230', 'name' => 'Voltage', 'detail' => true],
-                              '00210400' => ['OBIS' => '3340', 'divisor' => 1000, 'profile' => '', 'name' => 'Power Faktor', 'detail' => true]
+                              '00210400' => ['OBIS' => '3340', 'divisor' => 1000, 'profile' => '', 'name' => 'Power Factor', 'detail' => true]
     ];
 
     private const LIST_L2 = [ //Phase 2
@@ -229,12 +229,12 @@ class SMAHomeManagerDevice extends IPSModule
 
     private function RegisterVariables(): void
     {
-        $this->registerChannelVariablesFromList('SUM_', self::LIST_SUM, 10);
+        $this->registerChannelVariablesFromList('SUM', self::LIST_SUM, 10);
 
         if ($this->ReadPropertyBoolean(self::PROP_SHOW_SINGLE_PHASES)) {
-            $this->registerChannelVariablesFromList('L1_', self::LIST_L1, 300);
-            $this->registerChannelVariablesFromList('L2_', self::LIST_L2, 500);
-            $this->registerChannelVariablesFromList('L3_', self::LIST_L3, 700);
+            $this->registerChannelVariablesFromList('L1', self::LIST_L1, 300);
+            $this->registerChannelVariablesFromList('L2', self::LIST_L2, 500);
+            $this->registerChannelVariablesFromList('L3', self::LIST_L3, 700);
         }
     }
 
@@ -251,15 +251,41 @@ class SMAHomeManagerDevice extends IPSModule
     {
         if (!$channel['detail'] || $this->ReadPropertyBoolean(self::PROP_SHOW_DETAILED_CHANNELS)) {
             $ident = $this->getIdent($prefix, $channel['name']);
-            $this->SendDebug(sprintf('%s TEST', __FUNCTION__), $ident, 0);
-            $this->RegisterVariableFloat($ident, $this->translate($channel['name']), $channel['profile'], $position);
+            $this->RegisterVariableFloat($ident, $this->getModifiedName($prefix, $channel['name']), $channel['profile'], $position);
         }
+    }
+
+    private function getModifiedName(string $prefix, string $name): string
+    {
+        $suffix        = $this->getSuffix($name);
+        $cleanedString = str_replace([' +', ' -'], '', $name);
+
+        $translatedString = $this->Translate($cleanedString);
+
+        if ($prefix !== 'SUM') {
+            return $prefix . ' ' . $translatedString . $suffix;
+        }
+
+        return $translatedString . $suffix;
+    }
+
+    private function getSuffix(string $name): string
+    {
+        if (strpos($name, ' +') !== false) {
+            return ' +';
+        }
+
+        if (strpos($name, ' -') !== false) {
+            return ' -';
+        }
+
+        return '';
     }
 
     private function getIdent(string $prefix, string $name): string
     {
         $name = str_replace(['+', '-'], ['pos', 'neg'], $name);
-        return $prefix . preg_replace('/[^a-z0-9_]/i', '_', $name); //alles bis auf a-z, A-Z, 0-9 und '_' durch '_' ersetzen
+        return $prefix . '_' . preg_replace('/[^a-z0-9_]/i', '_', $name); //alles bis auf a-z, A-Z, 0-9 und '_' durch '_' ersetzen
     }
 
     public function ApplyChanges(): void
@@ -291,17 +317,17 @@ class SMAHomeManagerDevice extends IPSModule
         //Erkennungsstring
         $offset = 0;
         $len    = 4;
-        $this->SendDebug(sprintf('%s (%s)', __FUNCTION__, 'Erkennungsstring'), hex2bin(substr($hraw, $offset * 2, $len * 2)), 0);
+        //$this->SendDebug(sprintf('%s (%s)', __FUNCTION__, 'Erkennungsstring'), hex2bin(substr($hraw, $offset * 2, $len * 2)), 0);
 
         //Datenlänge
         $offset += $len;
         $len    = 4;
-        $this->SendDebug(sprintf('%s (%s)', __FUNCTION__, 'Datenlänge'), substr($hraw, $offset * 2, $len * 2), 0);
+        //$this->SendDebug(sprintf('%s (%s)', __FUNCTION__, 'Datenlänge'), substr($hraw, $offset * 2, $len * 2), 0);
 
         //gruppe
         $offset += $len;
         $len    = 2;
-        $this->SendDebug(sprintf('%s (%s)', __FUNCTION__, 'Gruppe'), substr($hraw, $offset * 2, $len * 2), 0);
+        //$this->SendDebug(sprintf('%s (%s)', __FUNCTION__, 'Gruppe'), substr($hraw, $offset * 2, $len * 2), 0);
 
         //ProtokollID
         $offset      = 16; //müsste sich eigentlich aus dem Protokoll ergeben
@@ -316,12 +342,12 @@ class SMAHomeManagerDevice extends IPSModule
         //zaehlerkennung
         $offset += $len;
         $len    = 6;
-        $this->SendDebug(sprintf('%s (%s)', __FUNCTION__, 'Zählerkennung'), substr($hraw, $offset * 2, $len * 2), 0);
+        //$this->SendDebug(sprintf('%s (%s)', __FUNCTION__, 'Zählerkennung'), substr($hraw, $offset * 2, $len * 2), 0);
 
         //Messzeitpunkt
         $offset += $len;
         $len    = 4;
-        $this->SendDebug(sprintf('%s (%s)', __FUNCTION__, 'Messzeitpunkt'), base_convert(substr($hraw, $offset * 2, $len * 2), 16, 10), 0);
+        //$this->SendDebug(sprintf('%s (%s)', __FUNCTION__, 'Messzeitpunkt'), base_convert(substr($hraw, $offset * 2, $len * 2), 16, 10), 0);
 
         $offset   += $len;
         $finished = false;
@@ -339,56 +365,55 @@ class SMAHomeManagerDevice extends IPSModule
             }
             $offset += $len;
 
-
             //obis Messwert
             $len = (int)substr($id, 2 * 2, 2); //die Länge entspricht der Messart (Byte 2)
 
             if (isset(self::LIST_SUM[$id])) {
-                $ident = $this->getIdent('SUM_', self::LIST_SUM[$id]['name']);
-                if (!self::LIST_SUM[$id]['detail'] || $this->ReadPropertyBoolean(self::PROP_SHOW_DETAILED_CHANNELS)) {
-                    $this->SetValue(
-                        $ident,
-                        base_convert(substr($hraw, $offset * 2, $len * 2), 16, 10) / self::LIST_SUM[$id]['divisor']
-                    );
-                }
+                $this->setValueFromHexAndList($id, $hraw, $offset, $len, 'SUM', self::LIST_SUM);
             } elseif (isset(self::LIST_L1[$id])) {
-                $ident = $this->getIdent('L1_', self::LIST_L1[$id]['name']);
-                if ($this->ReadPropertyBoolean(self::PROP_SHOW_SINGLE_PHASES)
-                    && ($this->ReadPropertyBoolean(self::PROP_SHOW_DETAILED_CHANNELS)
-                        || !self::LIST_L1[$id]['detail'])) {
-                    $this->SetValue(
-                        $ident,
-                        base_convert(substr($hraw, $offset * 2, $len * 2), 16, 10) / self::LIST_L1[$id]['divisor']
-                    );
-                }
+                $this->setValueFromHexAndList($id, $hraw, $offset, $len, 'L1', self::LIST_L1);
             } elseif (isset(self::LIST_L2[$id])) {
-                $ident = $this->getIdent('L2_', self::LIST_L2[$id]['name']);
-                if ($this->ReadPropertyBoolean(self::PROP_SHOW_SINGLE_PHASES)
-                    && ($this->ReadPropertyBoolean(self::PROP_SHOW_DETAILED_CHANNELS)
-                        || !self::LIST_L2[$id]['detail'])) {
-                    $this->SetValue(
-                        $ident,
-                        base_convert(substr($hraw, $offset * 2, $len * 2), 16, 10) / self::LIST_L2[$id]['divisor']
-                    );
-                }
+                $this->setValueFromHexAndList($id, $hraw, $offset, $len, 'L2', self::LIST_L2);
             } elseif (isset(self::LIST_L3[$id])) {
-                $ident = $this->getIdent('L3_', self::LIST_L3[$id]['name']);
-                if ($this->ReadPropertyBoolean(self::PROP_SHOW_SINGLE_PHASES)
-                    && ($this->ReadPropertyBoolean(self::PROP_SHOW_DETAILED_CHANNELS)
-                        || !self::LIST_L3[$id]['detail'])) {
-                    $this->SetValue(
-                        $ident,
-                        base_convert(substr($hraw, $offset * 2, $len * 2), 16, 10) / self::LIST_L3[$id]['divisor']
-                    );
-                }
+                $this->setValueFromHexAndList($id, $hraw, $offset, $len, 'L3', self::LIST_L3);
             } elseif ($id === '90000000') {
-                $len = 4;
-                $this->SendDebug(sprintf('%s (%s)', __FUNCTION__, 'SW-Version'), substr($hraw, $offset * 2, $len * 2), 0);
+                $len       = 4;
+                $swVersion = substr($hraw, $offset * 2, $len * 2);
+
+                $this->SendDebug(
+                    sprintf('%s (%s)', __FUNCTION__, 'SW-Version'),
+                    sprintf(
+                        '%s.%s.%s.%s',
+                        hexdec(substr($swVersion, 0, 2)),
+                        hexdec(substr($swVersion, 2, 2)),
+                        hexdec(substr($swVersion, 4, 2)),
+                        hexdec(substr($swVersion, 4, 2))
+                    ),
+                    0
+                );
             } else {
                 trigger_error("$id unbekannt");
                 $finished = true;
             }
             $offset += $len;
+        }
+    }
+
+    private function getSubstringFromHex(string $hraw, int $offset, int $len): string
+    {
+        return substr($hraw, $offset * 2, $len * 2);
+    }
+
+    private function setValueFromHexAndList(string $id, string $hraw, int $offset, int $len, string $prefix, array $list): void
+    {
+        $ident = $this->getIdent($prefix, $list[$id]['name']);
+        if ($this->ReadPropertyBoolean(self::PROP_SHOW_SINGLE_PHASES)
+            && ($this->ReadPropertyBoolean(self::PROP_SHOW_DETAILED_CHANNELS)
+                || !$list[$id]['detail'])) {
+            $this->SetValue(
+                $ident,
+                base_convert($this->getSubstringFromHex($hraw, $offset, $len), 16, 10) / $list[$id]['divisor']
+            );
         }
     }
 }
