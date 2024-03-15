@@ -48,6 +48,8 @@ Als Sende-Host ist der Name oder die IP-Adresse des Home Manager anzugeben, als 
 
 Die Statusvariablen werden automatisch angelegt. Das Löschen einzelner kann zu Fehlfunktionen führen.
 
+Es werden alle Messkanäle angelegt, die im Dokument [SMA Energy Meter - Zählerprotokoll](https://cdn.sma.de/fileadmin/content/www.developer.sma.de/docs/EMETER-Protokoll-TI-en-10.pdf) beschrieben sind.
+
 #### Statusvariablen
 
 #### Profile
