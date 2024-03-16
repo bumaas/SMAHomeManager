@@ -5,12 +5,12 @@
             "Show single phases": "Anzeige einzelner Phasen",
             "Real Power": "Wirkleistung",
             "Counter Real Power": "Zähler Wirkleistung",
-            "Reaactive Power": "Blindleistung",
+            "Reactive Power": "Blindleistung",
             "Counter Reactive Power": "Zähler Blindleistung",
             "Apparent Power": "Scheinleistung",
             "Counter Apparent Power": "Zähler Scheinleistung",
             "Power Factor": "Leistungsfaktor",
-            "Network Freqeuncy": "Netzfrequenz",
+            "Network Frequency": "Netzfrequenz",
             "Power": "Strom",
             "Voltage": "Spannung"
         }

@@ -301,11 +301,13 @@ class SMAHomeManagerDevice extends IPSModule
     public function ReceiveData($JSONString): void
     {
         $data = json_decode($JSONString, true, 512, JSON_THROW_ON_ERROR);
+        /*
         $this->SendDebug(
             sprintf('%s (%s:%s, %s)', __FUNCTION__, $data['ClientIP'], $data['ClientPort'], $data['DataID']),
             utf8_decode($data['Buffer']),
             0
         );
+        */
         $this->processData($data['Buffer']);
     }
 
@@ -407,7 +409,21 @@ class SMAHomeManagerDevice extends IPSModule
     private function setValueFromHexAndList(string $id, string $hraw, int $offset, int $len, string $prefix, array $list): void
     {
         $ident = $this->getIdent($prefix, $list[$id]['name']);
-        if ($this->ReadPropertyBoolean(self::PROP_SHOW_SINGLE_PHASES)
+        /*
+        $this->SendDebug(
+            sprintf('%s (%s)', __FUNCTION__, $id),
+            sprintf(
+                '%s: %s, %s, %s',
+                $prefix,
+                (int) $this->ReadPropertyBoolean(self::PROP_SHOW_SINGLE_PHASES),
+                (int) $this->ReadPropertyBoolean(self::PROP_SHOW_DETAILED_CHANNELS),
+                (int) $list[$id]['detail']
+            ),
+            0
+        );
+        */
+
+        if (($prefix === 'SUM' || $this->ReadPropertyBoolean(self::PROP_SHOW_SINGLE_PHASES))
             && ($this->ReadPropertyBoolean(self::PROP_SHOW_DETAILED_CHANNELS)
                 || !$list[$id]['detail'])) {
             $this->SetValue(
