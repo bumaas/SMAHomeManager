@@ -8,6 +8,10 @@ class SMAHomeManagerDevice extends IPSModule
     private const PROP_SHOW_SINGLE_PHASES     = 'ShowSinglePhases';
 
     private const PROFILE_ELECTRICITY_KWH = 'SMAHM.Electricity.kWh';
+    private const PROFILE_ELECTRICITY_VA = 'SMAHM.Electricity.VA';
+    private const PROFILE_ELECTRICITY_KVAH = 'SMAHM.Electricity.kVAh';
+    private const PROFILE_ELECTRICITY_VAR = 'SMAHM.Electricity.var';
+    private const PROFILE_ELECTRICITY_KVARH = 'SMAHM.Electricity.kvarh';
 
     // OBIS Parameter
 
@@ -27,40 +31,40 @@ class SMAHomeManagerDevice extends IPSModule
                        'name'    => 'Counter Real Power -',
                        'detail'  => false
         ],
-        '00030400' => ['OBIS' => '0340', 'divisor' => 10, 'profile' => '~Watt', 'name' => 'Reactive Power +', 'detail' => true],
+        '00030400' => ['OBIS' => '0340', 'divisor' => 10, 'profile' => self::PROFILE_ELECTRICITY_VAR, 'name' => 'Reactive Power +', 'detail' => true],
         '00030800' => [
             'OBIS'    => '0380',
             'divisor' => 3600000,
-            'profile' => self::PROFILE_ELECTRICITY_KWH,
+            'profile' => self::PROFILE_ELECTRICITY_KVARH,
             'name'    => 'Counter Reactive Power +',
             'detail'  => true
         ],
-        '00040400' => ['OBIS' => '0440', 'divisor' => 10, 'profile' => '~Watt', 'name' => 'Reactive Power -', 'detail' => true],
+        '00040400' => ['OBIS' => '0440', 'divisor' => 10, 'profile' => self::PROFILE_ELECTRICITY_VAR, 'name' => 'Reactive Power -', 'detail' => true],
         '00040800' => [
             'OBIS'    => '0480',
             'divisor' => 3600000,
-            'profile' => self::PROFILE_ELECTRICITY_KWH,
+            'profile' => self::PROFILE_ELECTRICITY_KVARH,
             'name'    => 'Counter Reactive Power -',
             'detail'  => true
         ],
-        '00090400' => ['OBIS' => '0940', 'divisor' => 10, 'profile' => '~Watt', 'name' => 'Apparent Power +', 'detail' => true],
+        '00090400' => ['OBIS' => '0940', 'divisor' => 10, 'profile' => self::PROFILE_ELECTRICITY_VA, 'name' => 'Apparent Power +', 'detail' => true],
         '00090800' => [
             'OBIS'    => '0980',
             'divisor' => 3600000,
-            'profile' => self::PROFILE_ELECTRICITY_KWH,
+            'profile' => self::PROFILE_ELECTRICITY_KVAH,
             'name'    => 'Counter Apparent Power +',
             'detail'  => true
         ],
-        '000a0400' => ['OBIS' => '1040', 'divisor' => 10, 'profile' => '~Watt', 'name' => 'Apparent Power -', 'detail' => true],
+        '000a0400' => ['OBIS' => '1040', 'divisor' => 10, 'profile' => self::PROFILE_ELECTRICITY_VA, 'name' => 'Apparent Power -', 'detail' => true],
         '000a0800' => [
             'OBIS'    => '1080',
             'divisor' => 3600000,
-            'profile' => self::PROFILE_ELECTRICITY_KWH,
+            'profile' => self::PROFILE_ELECTRICITY_KVAH,
             'name'    => 'Counter Apparent Power -',
             'detail'  => true
         ],
-        '000d0400' => ['OBIS' => '1340', 'divisor' => 1000, 'profile' => '', 'name' => 'Power Factor', 'detail' => true],
-        '000e0400' => ['OBIS' => '1440', 'divisor' => 1000, 'profile' => '~Hertz.50', 'name' => 'Network Frequency', 'detail' => true]
+        '000d0400' => ['OBIS' => '1340', 'divisor' => 1000, 'profile' => '', 'name' => 'Power Factor', 'detail' => false],
+        '000e0400' => ['OBIS' => '1440', 'divisor' => 1000, 'profile' => '~Hertz.50', 'name' => 'Network Frequency', 'detail' => false]
     ];
 
     private const LIST_L1 = [ //Phase 1
@@ -80,41 +84,41 @@ class SMAHomeManagerDevice extends IPSModule
                                   'name'    => 'Counter Real Power -',
                                   'detail'  => false
                               ],
-                              '00170400' => ['OBIS' => '2340', 'divisor' => 10, 'profile' => '~Watt', 'name' => 'Reactive Power +', 'detail' => true],
+                              '00170400' => ['OBIS' => '2340', 'divisor' => 10, 'profile' => self::PROFILE_ELECTRICITY_VAR, 'name' => 'Reactive Power +', 'detail' => true],
                               '00170800' => [
                                   'OBIS'    => '2380',
                                   'divisor' => 3600000,
-                                  'profile' => self::PROFILE_ELECTRICITY_KWH,
+                                  'profile' => self::PROFILE_ELECTRICITY_KVARH,
                                   'name'    => 'Counter Reactive Power +',
                                   'detail'  => true
                               ],
-                              '00180400' => ['OBIS' => '2440', 'divisor' => 10, 'profile' => '~Watt', 'name' => 'Reactive Power -', 'detail' => true],
+                              '00180400' => ['OBIS' => '2440', 'divisor' => 10, 'profile' => self::PROFILE_ELECTRICITY_VAR, 'name' => 'Reactive Power -', 'detail' => true],
                               '00180800' => [
                                   'OBIS'    => '2480',
                                   'divisor' => 3600000,
-                                  'profile' => self::PROFILE_ELECTRICITY_KWH,
+                                  'profile' => self::PROFILE_ELECTRICITY_KVARH,
                                   'name'    => 'Counter Reactive Power -',
                                   'detail'  => true
                               ],
-                              '001d0400' => ['OBIS' => '2940', 'divisor' => 10, 'profile' => '~Watt', 'name' => 'Apparent Power +', 'detail' => true],
+                              '001d0400' => ['OBIS' => '2940', 'divisor' => 10, 'profile' => self::PROFILE_ELECTRICITY_VA, 'name' => 'Apparent Power +', 'detail' => true],
                               '001d0800' => [
                                   'OBIS'    => '2980',
                                   'divisor' => 3600000,
-                                  'profile' => self::PROFILE_ELECTRICITY_KWH,
+                                  'profile' => self::PROFILE_ELECTRICITY_KVAH,
                                   'name'    => 'Counter Apparent Power +',
                                   'detail'  => true
                               ],
-                              '001e0400' => ['OBIS' => '3040', 'divisor' => 10, 'profile' => '~Watt', 'name' => 'Apparent Power -', 'detail' => true],
+                              '001e0400' => ['OBIS' => '3040', 'divisor' => 10, 'profile' => self::PROFILE_ELECTRICITY_VA, 'name' => 'Apparent Power -', 'detail' => true],
                               '001e0800' => [
                                   'OBIS'    => '3080',
                                   'divisor' => 3600000,
-                                  'profile' => self::PROFILE_ELECTRICITY_KWH,
+                                  'profile' => self::PROFILE_ELECTRICITY_KVAH,
                                   'name'    => 'Counter Apparent Power -',
                                   'detail'  => true
                               ],
-                              '001f0400' => ['OBIS' => '3140', 'divisor' => 1000, 'profile' => '~Ampere', 'name' => 'Power', 'detail' => true],
-                              '00200400' => ['OBIS' => '3240', 'divisor' => 1000, 'profile' => '~Volt.230', 'name' => 'Voltage', 'detail' => true],
-                              '00210400' => ['OBIS' => '3340', 'divisor' => 1000, 'profile' => '', 'name' => 'Power Factor', 'detail' => true]
+                              '001f0400' => ['OBIS' => '3140', 'divisor' => 1000, 'profile' => '~Ampere', 'name' => 'Power', 'detail' => false],
+                              '00200400' => ['OBIS' => '3240', 'divisor' => 1000, 'profile' => '~Volt.230', 'name' => 'Voltage', 'detail' => false],
+                              '00210400' => ['OBIS' => '3340', 'divisor' => 1000, 'profile' => '', 'name' => 'Power Factor', 'detail' => false]
     ];
 
     private const LIST_L2 = [ //Phase 2
@@ -134,41 +138,41 @@ class SMAHomeManagerDevice extends IPSModule
                                   'name'    => 'Counter Real Power -',
                                   'detail'  => false
                               ],
-                              '002b0400' => ['OBIS' => '4340', 'divisor' => 10, 'profile' => '~Watt', 'name' => 'Reactive Power +', 'detail' => true],
+                              '002b0400' => ['OBIS' => '4340', 'divisor' => 10, 'profile' => self::PROFILE_ELECTRICITY_VAR, 'name' => 'Reactive Power +', 'detail' => true],
                               '002b0800' => [
                                   'OBIS'    => '4380',
                                   'divisor' => 3600000,
-                                  'profile' => self::PROFILE_ELECTRICITY_KWH,
+                                  'profile' => self::PROFILE_ELECTRICITY_KVARH,
                                   'name'    => 'Counter Reactive Power +',
                                   'detail'  => true
                               ],
-                              '002c0400' => ['OBIS' => '4440', 'divisor' => 10, 'profile' => '~Watt', 'name' => 'Reactive Power -', 'detail' => true],
+                              '002c0400' => ['OBIS' => '4440', 'divisor' => 10, 'profile' => self::PROFILE_ELECTRICITY_VAR, 'name' => 'Reactive Power -', 'detail' => true],
                               '002c0800' => [
                                   'OBIS'    => '4480',
                                   'divisor' => 3600000,
-                                  'profile' => self::PROFILE_ELECTRICITY_KWH,
+                                  'profile' => self::PROFILE_ELECTRICITY_KVARH,
                                   'name'    => 'Counter Reactive Power -',
                                   'detail'  => true
                               ],
-                              '00310400' => ['OBIS' => '4940', 'divisor' => 10, 'profile' => '~Watt', 'name' => 'Apparent Power +', 'detail' => true],
+                              '00310400' => ['OBIS' => '4940', 'divisor' => 10, 'profile' => self::PROFILE_ELECTRICITY_VA, 'name' => 'Apparent Power +', 'detail' => true],
                               '00310800' => [
                                   'OBIS'    => '4980',
                                   'divisor' => 3600000,
-                                  'profile' => self::PROFILE_ELECTRICITY_KWH,
+                                  'profile' => self::PROFILE_ELECTRICITY_KVAH,
                                   'name'    => 'Counter Apparent Power +',
                                   'detail'  => true
                               ],
-                              '00320400' => ['OBIS' => '5040', 'divisor' => 10, 'profile' => '~Watt', 'name' => 'Apparent Power -', 'detail' => true],
+                              '00320400' => ['OBIS' => '5040', 'divisor' => 10, 'profile' => self::PROFILE_ELECTRICITY_VA, 'name' => 'Apparent Power -', 'detail' => true],
                               '00320800' => [
                                   'OBIS'    => '5080',
                                   'divisor' => 3600000,
                                   'profile' => '~Electricity.Wh',
-                                  'name'    => self::PROFILE_ELECTRICITY_KWH,
+                                  'name'    => self::PROFILE_ELECTRICITY_KVAH,
                                   'detail'  => true
                               ],
-                              '00330400' => ['OBIS' => '5140', 'divisor' => 1000, 'profile' => '~Ampere', 'name' => 'Power', 'detail' => true],
-                              '00340400' => ['OBIS' => '5240', 'divisor' => 1000, 'profile' => '~Volt.230', 'name' => 'Voltage', 'detail' => true],
-                              '00350400' => ['OBIS' => '5340', 'divisor' => 1000, 'profile' => '', 'name' => 'Power Faktor', 'detail' => true]
+                              '00330400' => ['OBIS' => '5140', 'divisor' => 1000, 'profile' => '~Ampere', 'name' => 'Power', 'detail' => false],
+                              '00340400' => ['OBIS' => '5240', 'divisor' => 1000, 'profile' => '~Volt.230', 'name' => 'Voltage', 'detail' => false],
+                              '00350400' => ['OBIS' => '5340', 'divisor' => 1000, 'profile' => '', 'name' => 'Power Factor', 'detail' => false]
     ];
 
     private const LIST_L3 = [ //Phase 3
@@ -188,41 +192,41 @@ class SMAHomeManagerDevice extends IPSModule
                                   'name'    => 'Counter Real Power -',
                                   'detail'  => false
                               ],
-                              '003f0400' => ['OBIS' => '6340', 'divisor' => 10, 'profile' => '~Watt', 'name' => 'Reactive Power +', 'detail' => true],
+                              '003f0400' => ['OBIS' => '6340', 'divisor' => 10, 'profile' => self::PROFILE_ELECTRICITY_VAR, 'name' => 'Reactive Power +', 'detail' => true],
                               '003f0800' => [
                                   'OBIS'    => '6380',
                                   'divisor' => 3600000,
-                                  'profile' => self::PROFILE_ELECTRICITY_KWH,
+                                  'profile' => self::PROFILE_ELECTRICITY_KVARH,
                                   'name'    => 'Counter Reactive Power +',
                                   'detail'  => true
                               ],
-                              '00400400' => ['OBIS' => '6440', 'divisor' => 10, 'profile' => '~Watt', 'name' => 'Reactive Power -', 'detail' => true],
+                              '00400400' => ['OBIS' => '6440', 'divisor' => 10, 'profile' => self::PROFILE_ELECTRICITY_VAR, 'name' => 'Reactive Power -', 'detail' => true],
                               '00400800' => [
                                   'OBIS'    => '6480',
                                   'divisor' => 3600000,
-                                  'profile' => self::PROFILE_ELECTRICITY_KWH,
+                                  'profile' => self::PROFILE_ELECTRICITY_KVARH,
                                   'name'    => 'Counter Reactive Power -',
                                   'detail'  => true
                               ],
-                              '00450400' => ['OBIS' => '6940', 'divisor' => 10, 'profile' => '~Watt', 'name' => 'Apparent Power +', 'detail' => true],
+                              '00450400' => ['OBIS' => '6940', 'divisor' => 10, 'profile' => self::PROFILE_ELECTRICITY_VA, 'name' => 'Apparent Power +', 'detail' => true],
                               '00450800' => [
                                   'OBIS'    => '6980',
                                   'divisor' => 3600000,
-                                  'profile' => self::PROFILE_ELECTRICITY_KWH,
+                                  'profile' => self::PROFILE_ELECTRICITY_KVAH,
                                   'name'    => 'Counter Apparent Power +',
                                   'detail'  => true
                               ],
-                              '00460400' => ['OBIS' => '7040', 'divisor' => 10, 'profile' => '~Watt', 'name' => 'Apparent Power -', 'detail' => true],
+                              '00460400' => ['OBIS' => '7040', 'divisor' => 10, 'profile' => self::PROFILE_ELECTRICITY_VA, 'name' => 'Apparent Power -', 'detail' => true],
                               '00460800' => [
                                   'OBIS'    => '7080',
                                   'divisor' => 3600000,
-                                  'profile' => self::PROFILE_ELECTRICITY_KWH,
+                                  'profile' => self::PROFILE_ELECTRICITY_KVAH,
                                   'name'    => 'Counter Apparent Power -',
                                   'detail'  => true
                               ],
-                              '00470400' => ['OBIS' => '7140', 'divisor' => 1000, 'profile' => '~Ampere', 'name' => 'Power', 'detail' => true],
-                              '00480400' => ['OBIS' => '7240', 'divisor' => 1000, 'profile' => '~Volt.230', 'name' => 'Voltage', 'detail' => true],
-                              '00490400' => ['OBIS' => '7340', 'divisor' => 1000, 'profile' => '', 'name' => 'Power Faktor', 'detail' => true]
+                              '00470400' => ['OBIS' => '7140', 'divisor' => 1000, 'profile' => '~Ampere', 'name' => 'Power', 'detail' => false],
+                              '00480400' => ['OBIS' => '7240', 'divisor' => 1000, 'profile' => '~Volt.230', 'name' => 'Voltage', 'detail' => false],
+                              '00490400' => ['OBIS' => '7340', 'divisor' => 1000, 'profile' => '', 'name' => 'Power Factor', 'detail' => false]
     ];
 
     private const POSITION_STEP = 10;
@@ -244,6 +248,24 @@ class SMAHomeManagerDevice extends IPSModule
         if (!IPS_VariableProfileExists(self::PROFILE_ELECTRICITY_KWH)) {
             IPS_CreateVariableProfile(self::PROFILE_ELECTRICITY_KWH, VARIABLETYPE_FLOAT);
             IPS_SetVariableProfileText(self::PROFILE_ELECTRICITY_KWH, '', ' kWh');
+        }
+        if (!IPS_VariableProfileExists(self::PROFILE_ELECTRICITY_VAR)) {
+            IPS_CreateVariableProfile(self::PROFILE_ELECTRICITY_VAR, VARIABLETYPE_FLOAT);
+            IPS_SetVariableProfileText(self::PROFILE_ELECTRICITY_VAR, '', ' var');
+            IPS_SetVariableProfileDigits(self::PROFILE_ELECTRICITY_VAR, 1);
+        }
+        if (!IPS_VariableProfileExists(self::PROFILE_ELECTRICITY_KVARH)) {
+            IPS_CreateVariableProfile(self::PROFILE_ELECTRICITY_KVARH, VARIABLETYPE_FLOAT);
+            IPS_SetVariableProfileText(self::PROFILE_ELECTRICITY_KVARH, '', ' kvarh');
+        }
+        if (!IPS_VariableProfileExists(self::PROFILE_ELECTRICITY_VA)) {
+            IPS_CreateVariableProfile(self::PROFILE_ELECTRICITY_VA, VARIABLETYPE_FLOAT);
+            IPS_SetVariableProfileText(self::PROFILE_ELECTRICITY_VA, '', ' VA');
+            IPS_SetVariableProfileDigits(self::PROFILE_ELECTRICITY_VA, 1);
+        }
+        if (!IPS_VariableProfileExists(self::PROFILE_ELECTRICITY_KVAH)) {
+            IPS_CreateVariableProfile(self::PROFILE_ELECTRICITY_KVAH, VARIABLETYPE_FLOAT);
+            IPS_SetVariableProfileText(self::PROFILE_ELECTRICITY_KVAH, '', ' kVAh');
         }
     }
 
