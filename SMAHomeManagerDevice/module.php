@@ -63,7 +63,7 @@ class SMAHomeManagerDevice extends IPSModule
             'name'    => 'Counter Apparent Power -',
             'detail'  => true
         ],
-        '000d0400' => ['OBIS' => '1340', 'divisor' => 1000, 'profile' => '', 'name' => 'Power Factor', 'detail' => false],
+        '000d0400' => ['OBIS' => '1340', 'divisor' => 1000, 'profile' => '', 'name' => 'Power Factor', 'detail' => true],
         '000e0400' => ['OBIS' => '1440', 'divisor' => 1000, 'profile' => '~Hertz.50', 'name' => 'Network Frequency', 'detail' => false]
     ];
 
@@ -118,7 +118,7 @@ class SMAHomeManagerDevice extends IPSModule
                               ],
                               '001f0400' => ['OBIS' => '3140', 'divisor' => 1000, 'profile' => '~Ampere', 'name' => 'Power', 'detail' => false],
                               '00200400' => ['OBIS' => '3240', 'divisor' => 1000, 'profile' => '~Volt.230', 'name' => 'Voltage', 'detail' => false],
-                              '00210400' => ['OBIS' => '3340', 'divisor' => 1000, 'profile' => '', 'name' => 'Power Factor', 'detail' => false]
+                              '00210400' => ['OBIS' => '3340', 'divisor' => 1000, 'profile' => '', 'name' => 'Power Factor', 'detail' => true]
     ];
 
     private const LIST_L2 = [ //Phase 2
@@ -166,13 +166,13 @@ class SMAHomeManagerDevice extends IPSModule
                               '00320800' => [
                                   'OBIS'    => '5080',
                                   'divisor' => 3600000,
-                                  'profile' => '~Electricity.Wh',
-                                  'name'    => self::PROFILE_ELECTRICITY_KVAH,
+                                  'profile' => self::PROFILE_ELECTRICITY_KVAH,
+                                  'name'    => 'Counter Apparent Power -',
                                   'detail'  => true
                               ],
                               '00330400' => ['OBIS' => '5140', 'divisor' => 1000, 'profile' => '~Ampere', 'name' => 'Power', 'detail' => false],
                               '00340400' => ['OBIS' => '5240', 'divisor' => 1000, 'profile' => '~Volt.230', 'name' => 'Voltage', 'detail' => false],
-                              '00350400' => ['OBIS' => '5340', 'divisor' => 1000, 'profile' => '', 'name' => 'Power Factor', 'detail' => false]
+                              '00350400' => ['OBIS' => '5340', 'divisor' => 1000, 'profile' => '', 'name' => 'Power Factor', 'detail' => true]
     ];
 
     private const LIST_L3 = [ //Phase 3
@@ -226,7 +226,7 @@ class SMAHomeManagerDevice extends IPSModule
                               ],
                               '00470400' => ['OBIS' => '7140', 'divisor' => 1000, 'profile' => '~Ampere', 'name' => 'Power', 'detail' => false],
                               '00480400' => ['OBIS' => '7240', 'divisor' => 1000, 'profile' => '~Volt.230', 'name' => 'Voltage', 'detail' => false],
-                              '00490400' => ['OBIS' => '7340', 'divisor' => 1000, 'profile' => '', 'name' => 'Power Factor', 'detail' => false]
+                              '00490400' => ['OBIS' => '7340', 'divisor' => 1000, 'profile' => '', 'name' => 'Power Factor', 'detail' => true]
     ];
 
     private const POSITION_STEP = 10;
