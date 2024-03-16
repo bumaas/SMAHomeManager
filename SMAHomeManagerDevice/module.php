@@ -7,19 +7,31 @@ class SMAHomeManagerDevice extends IPSModule
     private const PROP_SHOW_DETAILED_CHANNELS = 'ShowDetailedChannels';
     private const PROP_SHOW_SINGLE_PHASES     = 'ShowSinglePhases';
 
+    private const PROFILE_ELECTRICITY_KWH = 'SMAHM.Electricity.kWh';
+
     // OBIS Parameter
 
     //Summen
     private const LIST_SUM = [
         '00010400' => ['OBIS' => '0140', 'divisor' => 10, 'profile' => '~Watt', 'name' => 'Real Power +', 'detail' => false],
-        '00010800' => ['OBIS' => '0180', 'divisor' => 3600000, 'profile' => '~Electricity.Wh', 'name' => 'Counter Real Power +', 'detail' => false],
+        '00010800' => ['OBIS'    => '0180',
+                       'divisor' => 3600000,
+                       'profile' => self::PROFILE_ELECTRICITY_KWH,
+                       'name'    => 'Counter Real Power +',
+                       'detail'  => false
+        ],
         '00020400' => ['OBIS' => '0240', 'divisor' => 10, 'profile' => '~Watt', 'name' => 'Real Power -', 'detail' => false],
-        '00020800' => ['OBIS' => '0280', 'divisor' => 3600000, 'profile' => '~Electricity.Wh', 'name' => 'Counter Real Power -', 'detail' => false],
+        '00020800' => ['OBIS'    => '0280',
+                       'divisor' => 3600000,
+                       'profile' => self::PROFILE_ELECTRICITY_KWH,
+                       'name'    => 'Counter Real Power -',
+                       'detail'  => false
+        ],
         '00030400' => ['OBIS' => '0340', 'divisor' => 10, 'profile' => '~Watt', 'name' => 'Reactive Power +', 'detail' => true],
         '00030800' => [
             'OBIS'    => '0380',
             'divisor' => 3600000,
-            'profile' => '~Electricity.Wh',
+            'profile' => self::PROFILE_ELECTRICITY_KWH,
             'name'    => 'Counter Reactive Power +',
             'detail'  => true
         ],
@@ -27,7 +39,7 @@ class SMAHomeManagerDevice extends IPSModule
         '00040800' => [
             'OBIS'    => '0480',
             'divisor' => 3600000,
-            'profile' => '~Electricity.Wh',
+            'profile' => self::PROFILE_ELECTRICITY_KWH,
             'name'    => 'Counter Reactive Power -',
             'detail'  => true
         ],
@@ -35,7 +47,7 @@ class SMAHomeManagerDevice extends IPSModule
         '00090800' => [
             'OBIS'    => '0980',
             'divisor' => 3600000,
-            'profile' => '~Electricity.Wh',
+            'profile' => self::PROFILE_ELECTRICITY_KWH,
             'name'    => 'Counter Apparent Power +',
             'detail'  => true
         ],
@@ -43,7 +55,7 @@ class SMAHomeManagerDevice extends IPSModule
         '000a0800' => [
             'OBIS'    => '1080',
             'divisor' => 3600000,
-            'profile' => '~Electricity.Wh',
+            'profile' => self::PROFILE_ELECTRICITY_KWH,
             'name'    => 'Counter Apparent Power -',
             'detail'  => true
         ],
@@ -56,7 +68,7 @@ class SMAHomeManagerDevice extends IPSModule
                               '00150800' => [
                                   'OBIS'    => '2180',
                                   'divisor' => 3600000,
-                                  'profile' => '~Electricity.Wh',
+                                  'profile' => self::PROFILE_ELECTRICITY_KWH,
                                   'name'    => 'Counter Real Power +',
                                   'detail'  => false
                               ],
@@ -64,7 +76,7 @@ class SMAHomeManagerDevice extends IPSModule
                               '00160800' => [
                                   'OBIS'    => '2280',
                                   'divisor' => 3600000,
-                                  'profile' => '~Electricity.Wh',
+                                  'profile' => self::PROFILE_ELECTRICITY_KWH,
                                   'name'    => 'Counter Real Power -',
                                   'detail'  => false
                               ],
@@ -72,7 +84,7 @@ class SMAHomeManagerDevice extends IPSModule
                               '00170800' => [
                                   'OBIS'    => '2380',
                                   'divisor' => 3600000,
-                                  'profile' => '~Electricity.Wh',
+                                  'profile' => self::PROFILE_ELECTRICITY_KWH,
                                   'name'    => 'Counter Reactive Power +',
                                   'detail'  => true
                               ],
@@ -80,7 +92,7 @@ class SMAHomeManagerDevice extends IPSModule
                               '00180800' => [
                                   'OBIS'    => '2480',
                                   'divisor' => 3600000,
-                                  'profile' => '~Electricity.Wh',
+                                  'profile' => self::PROFILE_ELECTRICITY_KWH,
                                   'name'    => 'Counter Reactive Power -',
                                   'detail'  => true
                               ],
@@ -88,7 +100,7 @@ class SMAHomeManagerDevice extends IPSModule
                               '001d0800' => [
                                   'OBIS'    => '2980',
                                   'divisor' => 3600000,
-                                  'profile' => '~Electricity.Wh',
+                                  'profile' => self::PROFILE_ELECTRICITY_KWH,
                                   'name'    => 'Counter Apparent Power +',
                                   'detail'  => true
                               ],
@@ -96,7 +108,7 @@ class SMAHomeManagerDevice extends IPSModule
                               '001e0800' => [
                                   'OBIS'    => '3080',
                                   'divisor' => 3600000,
-                                  'profile' => '~Electricity.Wh',
+                                  'profile' => self::PROFILE_ELECTRICITY_KWH,
                                   'name'    => 'Counter Apparent Power -',
                                   'detail'  => true
                               ],
@@ -110,7 +122,7 @@ class SMAHomeManagerDevice extends IPSModule
                               '00290800' => [
                                   'OBIS'    => '4180',
                                   'divisor' => 3600000,
-                                  'profile' => '~Electricity.Wh',
+                                  'profile' => self::PROFILE_ELECTRICITY_KWH,
                                   'name'    => 'Counter Real Power +',
                                   'detail'  => false
                               ],
@@ -118,7 +130,7 @@ class SMAHomeManagerDevice extends IPSModule
                               '002a0800' => [
                                   'OBIS'    => '4280',
                                   'divisor' => 3600000,
-                                  'profile' => '~Electricity.Wh',
+                                  'profile' => self::PROFILE_ELECTRICITY_KWH,
                                   'name'    => 'Counter Real Power -',
                                   'detail'  => false
                               ],
@@ -126,7 +138,7 @@ class SMAHomeManagerDevice extends IPSModule
                               '002b0800' => [
                                   'OBIS'    => '4380',
                                   'divisor' => 3600000,
-                                  'profile' => '~Electricity.Wh',
+                                  'profile' => self::PROFILE_ELECTRICITY_KWH,
                                   'name'    => 'Counter Reactive Power +',
                                   'detail'  => true
                               ],
@@ -134,7 +146,7 @@ class SMAHomeManagerDevice extends IPSModule
                               '002c0800' => [
                                   'OBIS'    => '4480',
                                   'divisor' => 3600000,
-                                  'profile' => '~Electricity.Wh',
+                                  'profile' => self::PROFILE_ELECTRICITY_KWH,
                                   'name'    => 'Counter Reactive Power -',
                                   'detail'  => true
                               ],
@@ -142,7 +154,7 @@ class SMAHomeManagerDevice extends IPSModule
                               '00310800' => [
                                   'OBIS'    => '4980',
                                   'divisor' => 3600000,
-                                  'profile' => '~Electricity.Wh',
+                                  'profile' => self::PROFILE_ELECTRICITY_KWH,
                                   'name'    => 'Counter Apparent Power +',
                                   'detail'  => true
                               ],
@@ -151,7 +163,7 @@ class SMAHomeManagerDevice extends IPSModule
                                   'OBIS'    => '5080',
                                   'divisor' => 3600000,
                                   'profile' => '~Electricity.Wh',
-                                  'name'    => 'Counter Apparent Power -',
+                                  'name'    => self::PROFILE_ELECTRICITY_KWH,
                                   'detail'  => true
                               ],
                               '00330400' => ['OBIS' => '5140', 'divisor' => 1000, 'profile' => '~Ampere', 'name' => 'Power', 'detail' => true],
@@ -164,7 +176,7 @@ class SMAHomeManagerDevice extends IPSModule
                               '003d0800' => [
                                   'OBIS'    => '6180',
                                   'divisor' => 3600000,
-                                  'profile' => '~Electricity.Wh',
+                                  'profile' => self::PROFILE_ELECTRICITY_KWH,
                                   'name'    => 'Counter Real Power +',
                                   'detail'  => false
                               ],
@@ -172,7 +184,7 @@ class SMAHomeManagerDevice extends IPSModule
                               '003e0800' => [
                                   'OBIS'    => '6280',
                                   'divisor' => 3600000,
-                                  'profile' => '~Electricity.Wh',
+                                  'profile' => self::PROFILE_ELECTRICITY_KWH,
                                   'name'    => 'Counter Real Power -',
                                   'detail'  => false
                               ],
@@ -180,7 +192,7 @@ class SMAHomeManagerDevice extends IPSModule
                               '003f0800' => [
                                   'OBIS'    => '6380',
                                   'divisor' => 3600000,
-                                  'profile' => '~Electricity.Wh',
+                                  'profile' => self::PROFILE_ELECTRICITY_KWH,
                                   'name'    => 'Counter Reactive Power +',
                                   'detail'  => true
                               ],
@@ -188,7 +200,7 @@ class SMAHomeManagerDevice extends IPSModule
                               '00400800' => [
                                   'OBIS'    => '6480',
                                   'divisor' => 3600000,
-                                  'profile' => '~Electricity.Wh',
+                                  'profile' => self::PROFILE_ELECTRICITY_KWH,
                                   'name'    => 'Counter Reactive Power -',
                                   'detail'  => true
                               ],
@@ -196,7 +208,7 @@ class SMAHomeManagerDevice extends IPSModule
                               '00450800' => [
                                   'OBIS'    => '6980',
                                   'divisor' => 3600000,
-                                  'profile' => '~Electricity.Wh',
+                                  'profile' => self::PROFILE_ELECTRICITY_KWH,
                                   'name'    => 'Counter Apparent Power +',
                                   'detail'  => true
                               ],
@@ -204,7 +216,7 @@ class SMAHomeManagerDevice extends IPSModule
                               '00460800' => [
                                   'OBIS'    => '7080',
                                   'divisor' => 3600000,
-                                  'profile' => '~Electricity.Wh',
+                                  'profile' => self::PROFILE_ELECTRICITY_KWH,
                                   'name'    => 'Counter Apparent Power -',
                                   'detail'  => true
                               ],
@@ -225,6 +237,14 @@ class SMAHomeManagerDevice extends IPSModule
 
 
         $this->RequireParent(self::MODID_MULTICAST_SOCKET);
+    }
+
+    private function CreateProfiles(): void
+    {
+        if (!IPS_VariableProfileExists(self::PROFILE_ELECTRICITY_KWH)) {
+            IPS_CreateVariableProfile(self::PROFILE_ELECTRICITY_KWH, VARIABLETYPE_FLOAT);
+            IPS_SetVariableProfileText(self::PROFILE_ELECTRICITY_KWH, '', ' kWh');
+        }
     }
 
     private function RegisterVariables(): void
@@ -271,11 +291,11 @@ class SMAHomeManagerDevice extends IPSModule
 
     private function getSuffix(string $name): string
     {
-        if (strpos($name, ' +') !== false) {
+        if (str_contains($name, ' +')) {
             return ' +';
         }
 
-        if (strpos($name, ' -') !== false) {
+        if (str_contains($name, ' -')) {
             return ' -';
         }
 
@@ -291,6 +311,7 @@ class SMAHomeManagerDevice extends IPSModule
     public function ApplyChanges(): void
     {
         $this->RegisterVariables();
+        $this->CreateProfiles();
 
         $this->SetStatus(IS_ACTIVE);
 
