@@ -1,8 +1,15 @@
 {
-    "elements": [
-        { "type": "CheckBox", "name": "ShowDetailedChannels", "caption": "Show more detailed measurement channels (apparent power, reactive power)" },
-        { "type": "CheckBox", "name": "ShowSinglePhases", "caption": "Show single phases" }
-    ],
-    "actions": [],
-    "status": []
+  "elements": [
+    {"type": "CheckBox", "name": "ShowDetailedChannels", "caption": "Show more detailed measurement channels (apparent power, reactive power)"},
+    {"type": "CheckBox", "name": "ShowSinglePhases", "caption": "Show single phases"},
+    {
+      "type":  "ExpansionPanel", "caption": "Expert Parameters",
+      "items": [
+        {"type": "NumberSpinner", "name": "ExtendedUpdateInterval", "caption": "Extended Update Interval", "suffix": "Seconds", "minimum":  0},
+        {"type": "CheckBox", "name": "ExtendedDebugInformation", "caption": "Extended Debug Information"}
+      ]
+    }
+  ],
+  "actions":  [],
+  "status":   []
 }

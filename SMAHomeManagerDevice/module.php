@@ -3,14 +3,16 @@
 declare(strict_types=1);
 class SMAHomeManagerDevice extends IPSModule
 {
-    private const MODID_MULTICAST_SOCKET      = '{BAB408E0-0A0F-48C3-B14E-9FB2FA81F66A}';
-    private const PROP_SHOW_DETAILED_CHANNELS = 'ShowDetailedChannels';
-    private const PROP_SHOW_SINGLE_PHASES     = 'ShowSinglePhases';
+    private const MODID_MULTICAST_SOCKET          = '{BAB408E0-0A0F-48C3-B14E-9FB2FA81F66A}';
+    private const PROP_SHOW_DETAILED_CHANNELS     = 'ShowDetailedChannels';
+    private const PROP_SHOW_SINGLE_PHASES         = 'ShowSinglePhases';
+    private const PROP_EXTENDED_UPDATE_INTERVAL   = 'ExtendedUpdateInterval';
+    private const PROP_ENTENDED_DEBUG_INFORMATION = 'ExtendedDebugInformation';
 
-    private const PROFILE_ELECTRICITY_KWH = 'SMAHM.Electricity.kWh';
-    private const PROFILE_ELECTRICITY_VA = 'SMAHM.Electricity.VA';
-    private const PROFILE_ELECTRICITY_KVAH = 'SMAHM.Electricity.kVAh';
-    private const PROFILE_ELECTRICITY_VAR = 'SMAHM.Electricity.var';
+    private const PROFILE_ELECTRICITY_KWH   = 'SMAHM.Electricity.kWh';
+    private const PROFILE_ELECTRICITY_VA    = 'SMAHM.Electricity.VA';
+    private const PROFILE_ELECTRICITY_KVAH  = 'SMAHM.Electricity.kVAh';
+    private const PROFILE_ELECTRICITY_VAR   = 'SMAHM.Electricity.var';
     private const PROFILE_ELECTRICITY_KVARH = 'SMAHM.Electricity.kvarh';
 
     // OBIS Parameter
@@ -18,18 +20,20 @@ class SMAHomeManagerDevice extends IPSModule
     //Summen
     private const LIST_SUM = [
         '00010400' => ['OBIS' => '0140', 'divisor' => 10, 'profile' => '~Watt', 'name' => 'Real Power +', 'detail' => false],
-        '00010800' => ['OBIS'    => '0180',
-                       'divisor' => 3600000,
-                       'profile' => self::PROFILE_ELECTRICITY_KWH,
-                       'name'    => 'Counter Real Power +',
-                       'detail'  => false
+        '00010800' => [
+            'OBIS'    => '0180',
+            'divisor' => 3600000,
+            'profile' => self::PROFILE_ELECTRICITY_KWH,
+            'name'    => 'Counter Real Power +',
+            'detail'  => false
         ],
         '00020400' => ['OBIS' => '0240', 'divisor' => 10, 'profile' => '~Watt', 'name' => 'Real Power -', 'detail' => false],
-        '00020800' => ['OBIS'    => '0280',
-                       'divisor' => 3600000,
-                       'profile' => self::PROFILE_ELECTRICITY_KWH,
-                       'name'    => 'Counter Real Power -',
-                       'detail'  => false
+        '00020800' => [
+            'OBIS'    => '0280',
+            'divisor' => 3600000,
+            'profile' => self::PROFILE_ELECTRICITY_KWH,
+            'name'    => 'Counter Real Power -',
+            'detail'  => false
         ],
         '00030400' => ['OBIS' => '0340', 'divisor' => 10, 'profile' => self::PROFILE_ELECTRICITY_VAR, 'name' => 'Reactive Power +', 'detail' => true],
         '00030800' => [
@@ -84,7 +88,12 @@ class SMAHomeManagerDevice extends IPSModule
                                   'name'    => 'Counter Real Power -',
                                   'detail'  => false
                               ],
-                              '00170400' => ['OBIS' => '2340', 'divisor' => 10, 'profile' => self::PROFILE_ELECTRICITY_VAR, 'name' => 'Reactive Power +', 'detail' => true],
+                              '00170400' => ['OBIS'    => '2340',
+                                             'divisor' => 10,
+                                             'profile' => self::PROFILE_ELECTRICITY_VAR,
+                                             'name'    => 'Reactive Power +',
+                                             'detail'  => true
+                              ],
                               '00170800' => [
                                   'OBIS'    => '2380',
                                   'divisor' => 3600000,
@@ -92,7 +101,12 @@ class SMAHomeManagerDevice extends IPSModule
                                   'name'    => 'Counter Reactive Power +',
                                   'detail'  => true
                               ],
-                              '00180400' => ['OBIS' => '2440', 'divisor' => 10, 'profile' => self::PROFILE_ELECTRICITY_VAR, 'name' => 'Reactive Power -', 'detail' => true],
+                              '00180400' => ['OBIS'    => '2440',
+                                             'divisor' => 10,
+                                             'profile' => self::PROFILE_ELECTRICITY_VAR,
+                                             'name'    => 'Reactive Power -',
+                                             'detail'  => true
+                              ],
                               '00180800' => [
                                   'OBIS'    => '2480',
                                   'divisor' => 3600000,
@@ -100,7 +114,12 @@ class SMAHomeManagerDevice extends IPSModule
                                   'name'    => 'Counter Reactive Power -',
                                   'detail'  => true
                               ],
-                              '001d0400' => ['OBIS' => '2940', 'divisor' => 10, 'profile' => self::PROFILE_ELECTRICITY_VA, 'name' => 'Apparent Power +', 'detail' => true],
+                              '001d0400' => ['OBIS'    => '2940',
+                                             'divisor' => 10,
+                                             'profile' => self::PROFILE_ELECTRICITY_VA,
+                                             'name'    => 'Apparent Power +',
+                                             'detail'  => true
+                              ],
                               '001d0800' => [
                                   'OBIS'    => '2980',
                                   'divisor' => 3600000,
@@ -108,7 +127,12 @@ class SMAHomeManagerDevice extends IPSModule
                                   'name'    => 'Counter Apparent Power +',
                                   'detail'  => true
                               ],
-                              '001e0400' => ['OBIS' => '3040', 'divisor' => 10, 'profile' => self::PROFILE_ELECTRICITY_VA, 'name' => 'Apparent Power -', 'detail' => true],
+                              '001e0400' => ['OBIS'    => '3040',
+                                             'divisor' => 10,
+                                             'profile' => self::PROFILE_ELECTRICITY_VA,
+                                             'name'    => 'Apparent Power -',
+                                             'detail'  => true
+                              ],
                               '001e0800' => [
                                   'OBIS'    => '3080',
                                   'divisor' => 3600000,
@@ -138,7 +162,12 @@ class SMAHomeManagerDevice extends IPSModule
                                   'name'    => 'Counter Real Power -',
                                   'detail'  => false
                               ],
-                              '002b0400' => ['OBIS' => '4340', 'divisor' => 10, 'profile' => self::PROFILE_ELECTRICITY_VAR, 'name' => 'Reactive Power +', 'detail' => true],
+                              '002b0400' => ['OBIS'    => '4340',
+                                             'divisor' => 10,
+                                             'profile' => self::PROFILE_ELECTRICITY_VAR,
+                                             'name'    => 'Reactive Power +',
+                                             'detail'  => true
+                              ],
                               '002b0800' => [
                                   'OBIS'    => '4380',
                                   'divisor' => 3600000,
@@ -146,7 +175,12 @@ class SMAHomeManagerDevice extends IPSModule
                                   'name'    => 'Counter Reactive Power +',
                                   'detail'  => true
                               ],
-                              '002c0400' => ['OBIS' => '4440', 'divisor' => 10, 'profile' => self::PROFILE_ELECTRICITY_VAR, 'name' => 'Reactive Power -', 'detail' => true],
+                              '002c0400' => ['OBIS'    => '4440',
+                                             'divisor' => 10,
+                                             'profile' => self::PROFILE_ELECTRICITY_VAR,
+                                             'name'    => 'Reactive Power -',
+                                             'detail'  => true
+                              ],
                               '002c0800' => [
                                   'OBIS'    => '4480',
                                   'divisor' => 3600000,
@@ -154,7 +188,12 @@ class SMAHomeManagerDevice extends IPSModule
                                   'name'    => 'Counter Reactive Power -',
                                   'detail'  => true
                               ],
-                              '00310400' => ['OBIS' => '4940', 'divisor' => 10, 'profile' => self::PROFILE_ELECTRICITY_VA, 'name' => 'Apparent Power +', 'detail' => true],
+                              '00310400' => ['OBIS'    => '4940',
+                                             'divisor' => 10,
+                                             'profile' => self::PROFILE_ELECTRICITY_VA,
+                                             'name'    => 'Apparent Power +',
+                                             'detail'  => true
+                              ],
                               '00310800' => [
                                   'OBIS'    => '4980',
                                   'divisor' => 3600000,
@@ -162,7 +201,12 @@ class SMAHomeManagerDevice extends IPSModule
                                   'name'    => 'Counter Apparent Power +',
                                   'detail'  => true
                               ],
-                              '00320400' => ['OBIS' => '5040', 'divisor' => 10, 'profile' => self::PROFILE_ELECTRICITY_VA, 'name' => 'Apparent Power -', 'detail' => true],
+                              '00320400' => ['OBIS'    => '5040',
+                                             'divisor' => 10,
+                                             'profile' => self::PROFILE_ELECTRICITY_VA,
+                                             'name'    => 'Apparent Power -',
+                                             'detail'  => true
+                              ],
                               '00320800' => [
                                   'OBIS'    => '5080',
                                   'divisor' => 3600000,
@@ -192,7 +236,12 @@ class SMAHomeManagerDevice extends IPSModule
                                   'name'    => 'Counter Real Power -',
                                   'detail'  => false
                               ],
-                              '003f0400' => ['OBIS' => '6340', 'divisor' => 10, 'profile' => self::PROFILE_ELECTRICITY_VAR, 'name' => 'Reactive Power +', 'detail' => true],
+                              '003f0400' => ['OBIS'    => '6340',
+                                             'divisor' => 10,
+                                             'profile' => self::PROFILE_ELECTRICITY_VAR,
+                                             'name'    => 'Reactive Power +',
+                                             'detail'  => true
+                              ],
                               '003f0800' => [
                                   'OBIS'    => '6380',
                                   'divisor' => 3600000,
@@ -200,7 +249,12 @@ class SMAHomeManagerDevice extends IPSModule
                                   'name'    => 'Counter Reactive Power +',
                                   'detail'  => true
                               ],
-                              '00400400' => ['OBIS' => '6440', 'divisor' => 10, 'profile' => self::PROFILE_ELECTRICITY_VAR, 'name' => 'Reactive Power -', 'detail' => true],
+                              '00400400' => ['OBIS'    => '6440',
+                                             'divisor' => 10,
+                                             'profile' => self::PROFILE_ELECTRICITY_VAR,
+                                             'name'    => 'Reactive Power -',
+                                             'detail'  => true
+                              ],
                               '00400800' => [
                                   'OBIS'    => '6480',
                                   'divisor' => 3600000,
@@ -208,7 +262,12 @@ class SMAHomeManagerDevice extends IPSModule
                                   'name'    => 'Counter Reactive Power -',
                                   'detail'  => true
                               ],
-                              '00450400' => ['OBIS' => '6940', 'divisor' => 10, 'profile' => self::PROFILE_ELECTRICITY_VA, 'name' => 'Apparent Power +', 'detail' => true],
+                              '00450400' => ['OBIS'    => '6940',
+                                             'divisor' => 10,
+                                             'profile' => self::PROFILE_ELECTRICITY_VA,
+                                             'name'    => 'Apparent Power +',
+                                             'detail'  => true
+                              ],
                               '00450800' => [
                                   'OBIS'    => '6980',
                                   'divisor' => 3600000,
@@ -216,7 +275,12 @@ class SMAHomeManagerDevice extends IPSModule
                                   'name'    => 'Counter Apparent Power +',
                                   'detail'  => true
                               ],
-                              '00460400' => ['OBIS' => '7040', 'divisor' => 10, 'profile' => self::PROFILE_ELECTRICITY_VA, 'name' => 'Apparent Power -', 'detail' => true],
+                              '00460400' => ['OBIS'    => '7040',
+                                             'divisor' => 10,
+                                             'profile' => self::PROFILE_ELECTRICITY_VA,
+                                             'name'    => 'Apparent Power -',
+                                             'detail'  => true
+                              ],
                               '00460800' => [
                                   'OBIS'    => '7080',
                                   'divisor' => 3600000,
@@ -238,7 +302,8 @@ class SMAHomeManagerDevice extends IPSModule
 
         $this->RegisterPropertyBoolean(self::PROP_SHOW_DETAILED_CHANNELS, false);
         $this->RegisterPropertyBoolean(self::PROP_SHOW_SINGLE_PHASES, false);
-
+        $this->RegisterPropertyInteger(self::PROP_EXTENDED_UPDATE_INTERVAL, 0);
+        $this->RegisterPropertyBoolean(self::PROP_ENTENDED_DEBUG_INFORMATION, false);
 
         $this->RequireParent(self::MODID_MULTICAST_SOCKET);
     }
@@ -344,13 +409,13 @@ class SMAHomeManagerDevice extends IPSModule
     public function ReceiveData($JSONString): void
     {
         $data = json_decode($JSONString, true, 512, JSON_THROW_ON_ERROR);
-        /*
-        $this->SendDebug(
-            sprintf('%s (%s:%s, %s)', __FUNCTION__, $data['ClientIP'], $data['ClientPort'], $data['DataID']),
-            utf8_decode($data['Buffer']),
-            0
-        );
-        */
+        if ($this->ReadPropertyBoolean(self::PROP_ENTENDED_DEBUG_INFORMATION)) {
+            $this->SendDebug(
+                sprintf('%s (%s:%s, %s)', __FUNCTION__, $data['ClientIP'], $data['ClientPort'], $data['DataID']),
+                utf8_decode($data['Buffer']),
+                0
+            );
+        }
         $this->processData($data['Buffer']);
     }
 
@@ -362,17 +427,23 @@ class SMAHomeManagerDevice extends IPSModule
         //Erkennungsstring
         $offset = 0;
         $len    = 4;
-        //$this->SendDebug(sprintf('%s (%s)', __FUNCTION__, 'Erkennungsstring'), hex2bin(substr($hraw, $offset * 2, $len * 2)), 0);
+        if ($this->ReadPropertyBoolean(self::PROP_ENTENDED_DEBUG_INFORMATION)) {
+            $this->SendDebug(sprintf('%s (%s)', __FUNCTION__, 'Erkennungsstring'), hex2bin(substr($hraw, $offset * 2, $len * 2)), 0);
+        }
 
         //Datenlänge
         $offset += $len;
         $len    = 4;
-        //$this->SendDebug(sprintf('%s (%s)', __FUNCTION__, 'Datenlänge'), substr($hraw, $offset * 2, $len * 2), 0);
+        if ($this->ReadPropertyBoolean(self::PROP_ENTENDED_DEBUG_INFORMATION)) {
+            $this->SendDebug(sprintf('%s (%s)', __FUNCTION__, 'Datenlänge'), substr($hraw, $offset * 2, $len * 2), 0);
+        }
 
         //gruppe
         $offset += $len;
         $len    = 2;
-        //$this->SendDebug(sprintf('%s (%s)', __FUNCTION__, 'Gruppe'), substr($hraw, $offset * 2, $len * 2), 0);
+        if ($this->ReadPropertyBoolean(self::PROP_ENTENDED_DEBUG_INFORMATION)) {
+            $this->SendDebug(sprintf('%s (%s)', __FUNCTION__, 'Gruppe'), substr($hraw, $offset * 2, $len * 2), 0);
+        }
 
         //ProtokollID
         $offset      = 16; //müsste sich eigentlich aus dem Protokoll ergeben
@@ -387,12 +458,16 @@ class SMAHomeManagerDevice extends IPSModule
         //zaehlerkennung
         $offset += $len;
         $len    = 6;
-        //$this->SendDebug(sprintf('%s (%s)', __FUNCTION__, 'Zählerkennung'), substr($hraw, $offset * 2, $len * 2), 0);
+        if ($this->ReadPropertyBoolean(self::PROP_ENTENDED_DEBUG_INFORMATION)) {
+            $this->SendDebug(sprintf('%s (%s)', __FUNCTION__, 'Zählerkennung'), substr($hraw, $offset * 2, $len * 2), 0);
+        }
 
         //Messzeitpunkt
         $offset += $len;
         $len    = 4;
-        //$this->SendDebug(sprintf('%s (%s)', __FUNCTION__, 'Messzeitpunkt'), base_convert(substr($hraw, $offset * 2, $len * 2), 16, 10), 0);
+        if ($this->ReadPropertyBoolean(self::PROP_ENTENDED_DEBUG_INFORMATION)) {
+            $this->SendDebug(sprintf('%s (%s)', __FUNCTION__, 'Messzeitpunkt'), base_convert(substr($hraw, $offset * 2, $len * 2), 16, 10), 0);
+        }
 
         $offset   += $len;
         $finished = false;
@@ -401,7 +476,9 @@ class SMAHomeManagerDevice extends IPSModule
             //obis Id
             $len = 4;
             $id  = strtolower(substr($hraw, $offset * 2, $len * 2));
-            //$this->SendDebug(sprintf('%s (%s)', __FUNCTION__, 'id'), $id,0);
+            if ($this->ReadPropertyBoolean(self::PROP_ENTENDED_DEBUG_INFORMATION)) {
+                $this->SendDebug(sprintf('%s (%s)', __FUNCTION__, 'id'), $id, 0);
+            }
 
             //echo $id . PHP_EOL;
             if ($id === '00000000') {
@@ -449,29 +526,34 @@ class SMAHomeManagerDevice extends IPSModule
         return substr($hraw, $offset * 2, $len * 2);
     }
 
-    private function setValueFromHexAndList(string $id, string $hraw, int $offset, int $len, string $prefix, array $list): void
+    private function setValueFromHexAndList(string $obisID, string $hraw, int $offset, int $len, string $prefix, array $list): void
     {
-        $ident = $this->getIdent($prefix, $list[$id]['name']);
-        /*
-        $this->SendDebug(
-            sprintf('%s (%s)', __FUNCTION__, $id),
-            sprintf(
-                '%s: %s, %s, %s',
-                $prefix,
-                (int) $this->ReadPropertyBoolean(self::PROP_SHOW_SINGLE_PHASES),
-                (int) $this->ReadPropertyBoolean(self::PROP_SHOW_DETAILED_CHANNELS),
-                (int) $list[$id]['detail']
-            ),
-            0
-        );
-        */
+        $ident = $this->getIdent($prefix, $list[$obisID]['name']);
+        if ($this->ReadPropertyBoolean(self::PROP_ENTENDED_DEBUG_INFORMATION)) {
+            $this->SendDebug(
+                sprintf('%s (%s)', __FUNCTION__, $obisID),
+                sprintf(
+                    '%s: %s, %s, %s',
+                    $prefix,
+                    (int)$this->ReadPropertyBoolean(self::PROP_SHOW_SINGLE_PHASES),
+                    (int)$this->ReadPropertyBoolean(self::PROP_SHOW_DETAILED_CHANNELS),
+                    (int)$list[$obisID]['detail']
+                ),
+                0
+            );
+        }
 
         if (($prefix === 'SUM' || $this->ReadPropertyBoolean(self::PROP_SHOW_SINGLE_PHASES))
             && ($this->ReadPropertyBoolean(self::PROP_SHOW_DETAILED_CHANNELS)
-                || !$list[$id]['detail'])) {
+                || !$list[$obisID]['detail'])) {
+            $reducedUpdateFrequency = $this->ReadPropertyInteger(self::PROP_EXTENDED_UPDATE_INTERVAL);
+            if ($reducedUpdateFrequency > 0
+                && IPS_GetVariable($this->GetIDForIdent($ident))['VariableUpdated'] > (time() - $reducedUpdateFrequency)) {
+                return;
+            }
             $this->SetValue(
                 $ident,
-                base_convert($this->getSubstringFromHex($hraw, $offset, $len), 16, 10) / $list[$id]['divisor']
+                base_convert($this->getSubstringFromHex($hraw, $offset, $len), 16, 10) / $list[$obisID]['divisor']
             );
         }
     }

@@ -3,6 +3,10 @@
         "de": {
             "Show more detailed measurement channels (apparent power, reactive power)": "Anzeige detaillierterer Messkanäle (Scheinleistung, Blindleistung)",
             "Show single phases": "Anzeige einzelner Phasen",
+            "Expert Parameters": "Expertenoptionen",
+            "Extended Update Interval": "Verlängertes Aktualisierungsintervall",
+            "Seconds": "Sekunden",
+            "Extended Debug Information": "Erweiterte Debug Informationen",
             "Real Power": "Wirkleistung",
             "Counter Real Power": "Zähler Wirkleistung",
             "Reactive Power": "Blindleistung",
