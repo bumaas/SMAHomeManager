@@ -22,7 +22,7 @@ Statusvariablen zur Verfügung.
 
 ### 3. Software-Installation
 
-* Über den Module Store wird das 'SMA Home Manager Device'-Modul installiert.
+* Über den Module Store wird das 'SMA Home Manager'-Modul installiert.
 * Alternativ kann über das Module Control folgende URL hinzugefügt werden: https://github.com/bumaas/SMAHomeManager
 
 ### 4. Einrichten der Instanzen in IP-Symcon
