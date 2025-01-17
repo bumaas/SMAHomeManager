@@ -449,36 +449,80 @@ class SMAHomeManagerDevice extends IPSModuleStrict
     private function processData(string $hraw): void
     {
 //        $hraw = '534d4100000402a000000001024c0010606901f5b3b8f0ccb40a28ee00010400000000000001080000000001398f2c280002040000015923000208000000000c6bad6f98000304000000042700030800000000002f2071a8000404000000000000040800000000038a83f1c00009040000000000000908000000000207f7fa40000a04000001592a000a08000000000e32bfa9b0000d0400000003e8000e04000000c36f00150400000000000015080000000002160cf0180016040000006c3d00160800000000041f0b0c98001704000000029d001708000000000014d34c08001804000000000000180800000000019b47ccb8001d040000000000001d08000000000260c687b8001e040000006c45001e0800000000047bb9d668001f040000002c79002004000003b8be00210400000003e80029040000000000002908000000000097f628d0002a0400000077ea002a0800000000053ba6b680002b040000000312002b08000000000044f85090002c040000000000002c080000000000b3e6b70800310400000000000031080000000001087d1bb800320400000077f400320800000000054b48eab8003304000000313f003404000003b7e100350400000003e8003d040000000000003d080000000000be7e2408003e0400000074fd003e08000000000543edc2e8003f040000000000003f08000000000009a76148004004000000018800400800000000016fa7fa38004504000000000000450800000000016556b1a000460400000074ff004608000000000559c793a0004704000000306a004804000003b10900490400000003e890000000020e0d5200000000';
+//        $hraw = '534d4100 0004 02a0 0000 0001 024c 0010 6069 01f5b3b8f0cc b40a28ee 0001 0400000000000001080000000001398f2c280002040000015923000208000000000c6bad6f98000304000000042700030800000000002f2071a8000404000000000000040800000000038a83f1c00009040000000000000908000000000207f7fa40000a04000001592a000a08000000000e32bfa9b0000d0400000003e8000e04000000c36f00150400000000000015080000000002160cf0180016040000006c3d00160800000000041f0b0c98001704000000029d001708000000000014d34c08001804000000000000180800000000019b47ccb8001d040000000000001d08000000000260c687b8001e040000006c45001e0800000000047bb9d668001f040000002c79002004000003b8be00210400000003e80029040000000000002908000000000097f628d0002a0400000077ea002a0800000000053ba6b680002b040000000312002b08000000000044f85090002c040000000000002c080000000000b3e6b70800310400000000000031080000000001087d1bb800320400000077f400320800000000054b48eab8003304000000313f003404000003b7e100350400000003e8003d040000000000003d080000000000be7e2408003e0400000074fd003e08000000000543edc2e8003f040000000000003f08000000000009a76148004004000000018800400800000000016fa7fa38004504000000000000450800000000016556b1a000460400000074ff004608000000000559c793a0004704000000306a004804000003b10900490400000003e890000000020e0d5200000000';
+//        $hraw = '534d4100 0004 02a0 0000 0001 0042 0010 6073 3f88e87ff9d58ec4cd90d199e6246b36982ed0708fc4a4b695d81bd867d51822845594b74123621ae28c2d7e5ea4a05d750c256c948b7371c48b77df0256814200000000';
+//        $hraw = '534d4100000402a0000000010042001060733f88e87ff9d58ec4cd90d199e6246b36982ed0708fc4a4b695d81bd867d51822845594b74123621ae28c2d7e5ea4a05d750c256c948b7371c48b77df0256814200000000';
         $this->SendDebug(sprintf('%s (%s)', __FUNCTION__, 'hraw'), $hraw, 0);
 
         //Erkennungsstring
         $offset = 0;
         $len    = 4;
         if ($this->ReadPropertyBoolean(self::PROP_ENTENDED_DEBUG_INFORMATION)) {
-            $this->SendDebug(sprintf('%s (%s)', __FUNCTION__, 'Erkennungsstring'), hex2bin(substr($hraw, $offset * 2, $len * 2)), 0);
+            $this->SendDebug(sprintf('%s (%s:%s)', __FUNCTION__, $offset, 'Erkennungsstring')
+                , sprintf('%s (HEX: %s)', hex2bin(substr($hraw, $offset * 2, $len * 2)), substr($hraw, $offset * 2, $len * 2)), 0);
         }
 
-        //Datenlänge
+        //Datenlänge/Tag
         $offset += $len;
-        $len    = 4;
+        $len = 2;
+        $dataLen = hexdec(substr($hraw, $offset * 2, $len * 2));
         if ($this->ReadPropertyBoolean(self::PROP_ENTENDED_DEBUG_INFORMATION)) {
-            $this->SendDebug(sprintf('%s (%s)', __FUNCTION__, 'Datenlänge'), substr($hraw, $offset * 2, $len * 2), 0);
+            $this->SendDebug(
+                sprintf('%s (%s:%s)', __FUNCTION__, $offset, 'Datenlänge'),
+                (string)$dataLen,
+                0
+            );
+        }
+
+        //Tag
+        $offset += $len;
+        $len = $dataLen;
+        if ($this->ReadPropertyBoolean(self::PROP_ENTENDED_DEBUG_INFORMATION)) {
+            $this->SendDebug(sprintf('%s (%s)', __FUNCTION__, 'Tag')
+                , substr($hraw, ($offset) * 2, $len * 2) , 0);
         }
 
         //gruppe
         $offset += $len;
         $len    = 2;
         if ($this->ReadPropertyBoolean(self::PROP_ENTENDED_DEBUG_INFORMATION)) {
-            $this->SendDebug(sprintf('%s (%s)', __FUNCTION__, 'Gruppe'), substr($hraw, $offset * 2, $len * 2), 0);
+            $this->SendDebug(sprintf('%s (%s:%s)', __FUNCTION__, $offset, 'Gruppe')
+                , sprintf('%s',substr($hraw, $offset * 2, $len * 2)), 0);
+        }
+
+        //Datenlänge
+        $offset += $len;
+        $len = 2;
+        $dataLen = hexdec(substr($hraw, $offset * 2, $len * 2));
+        if ($this->ReadPropertyBoolean(self::PROP_ENTENDED_DEBUG_INFORMATION)) {
+            $this->SendDebug(
+                sprintf('%s (%s:%s)', __FUNCTION__, $offset, 'Datenlänge'),
+                (string)$dataLen,
+                0
+            );
+        }
+
+        //Tag
+        $offset += $len;
+        $len = 2;
+        if ($this->ReadPropertyBoolean(self::PROP_ENTENDED_DEBUG_INFORMATION)) {
+            $this->SendDebug(
+                sprintf('%s (%s:%s)', __FUNCTION__, $offset, 'Tag'),
+                sprintf('%s', substr($hraw, $offset * 2, $len * 2)),
+                0
+            );
         }
 
         //ProtokollID
-        $offset      = 16; //müsste sich eigentlich aus dem Protokoll ergeben
+        $offset      += $len;
         $len         = 2;
         $protokollID = substr($hraw, $offset * 2, $len * 2);
-        $this->SendDebug(sprintf('%s (%s)', __FUNCTION__, 'ProtokollID'), $protokollID, 0);
-        if ($protokollID === '6065') {
-            $this->SendDebug(sprintf('%s (%s)', __FUNCTION__, 'ProtokollID'), '- ignored -', 0);
+        if ($this->ReadPropertyBoolean(self::PROP_ENTENDED_DEBUG_INFORMATION)) {
+            $this->SendDebug(sprintf('%s (%s:%s)', __FUNCTION__, $offset, 'ProtokollID'), sprintf('%s', $protokollID), 0);
+        }
+        if ($protokollID !== '6069') {
+            $this->SendDebug(sprintf('%s (%s:%s)', __FUNCTION__, $offset, 'ProtokollID')
+                , sprintf('%s - ignored - ',substr($hraw, $offset * 2, $len * 2)), 0);
             return;
         }
 
@@ -486,14 +530,14 @@ class SMAHomeManagerDevice extends IPSModuleStrict
         $offset += $len;
         $len    = 6;
         if ($this->ReadPropertyBoolean(self::PROP_ENTENDED_DEBUG_INFORMATION)) {
-            $this->SendDebug(sprintf('%s (%s)', __FUNCTION__, 'Zählerkennung'), substr($hraw, $offset * 2, $len * 2), 0);
+            $this->SendDebug(sprintf('%s (%s:%s)', __FUNCTION__, $offset, 'Zählerkennung'), substr($hraw, $offset * 2, $len * 2), 0);
         }
 
         //Messzeitpunkt
         $offset += $len;
         $len    = 4;
         if ($this->ReadPropertyBoolean(self::PROP_ENTENDED_DEBUG_INFORMATION)) {
-            $this->SendDebug(sprintf('%s (%s)', __FUNCTION__, 'Messzeitpunkt'), base_convert(substr($hraw, $offset * 2, $len * 2), 16, 10), 0);
+            $this->SendDebug(sprintf('%s (%s:%s)', __FUNCTION__, $offset, 'Messzeitpunkt'), base_convert(substr($hraw, $offset * 2, $len * 2), 16, 10), 0);
         }
 
         $offset   += $len;
@@ -504,11 +548,11 @@ class SMAHomeManagerDevice extends IPSModuleStrict
             $len = 4;
             $id  = strtolower(substr($hraw, $offset * 2, $len * 2));
             if ($this->ReadPropertyBoolean(self::PROP_ENTENDED_DEBUG_INFORMATION)) {
-                $this->SendDebug(sprintf('%s (%s)', __FUNCTION__, 'id'), $id, 0);
+                $this->SendDebug(sprintf('%s (%s:%s)', __FUNCTION__, $offset, 'id'), $id, 0);
             }
 
             //echo $id . PHP_EOL;
-            if ($id === '00000000') {
+            if (in_array($id, ['00000000', ''])) {
                 $finished = true;
                 continue;
             }
@@ -543,7 +587,7 @@ class SMAHomeManagerDevice extends IPSModuleStrict
                 );
                 $this->setValue('SW_VERSION', $swVersion);
             } else {
-                trigger_error(sprintf('id \'%s\' unbekannt, hraw: %s', $id, $hraw));
+                trigger_error(sprintf('id \'%s\' (Len=%s) unbekannt, hraw: %s', $id, strlen($id), $hraw));
                 $finished = true;
             }
             $offset += $len;
