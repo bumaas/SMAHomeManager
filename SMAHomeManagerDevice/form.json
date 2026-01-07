@@ -1,5 +1,7 @@
 {
   "elements": [
+    {"type": "Label", "caption": "Serial Number (leave empty for auto-bind)"},
+    {"type": "ValidationTextBox", "name": "SerialNumber", "caption": "Serial Number"},
     {"type": "CheckBox", "name": "ShowDetailedChannels", "caption": "Show more detailed measurement channels (apparent power, reactive power)"},
     {"type": "CheckBox", "name": "ShowSinglePhases", "caption": "Show single phases"},
     {

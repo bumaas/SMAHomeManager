@@ -35,6 +35,7 @@ der [Dokumentation der Instanzen](https://www.symcon.de/service/dokumentation/ko
 
 | Name                                                               | Beschreibung                                                                                                                                                                                                |
 |--------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Seriennummer                                                       | Die Seriennummer des SMA Gerätes. Wenn das Feld leer bleibt, wird das erste empfangene Gerät verwendet.                                                                                                     |
 | Anzeige detaillierterer Messkanäle (Scheinleistung, Blindleistung) | Legt fest, ob neben der Wirkleistung auch die Blind- und Scheinleistung angezeigt werden soll.                                                                                                              |
 | Anzeige einzelner Phasen                                           | Legt fest, ob zusätzlich zu den Summenwerten auch die Werte der einzelnen Phasen L1, L2 und L3 angezeigt werden sollen.                                                                                     |
 | Verlängertes Aktualisierungsintervall                              | Der Multicast Socket empfängt jede Sekunde die Daten vom Energy Meter. Sollen die Daten weniger häufig verarbeitet werden, so kann das Intervall entsprechend hoch gesetzt werden (0 = keine Verlängerung). |
@@ -42,7 +43,7 @@ der [Dokumentation der Instanzen](https://www.symcon.de/service/dokumentation/ko
 
 #### Konfigurationsseite der IO-Instanz
 
-Beim Anlegen der Geräteinstanz wird automatisch auch der benötigte Multicast Socket angelegt. Er ist wie folgt zu konfigurieren:
+Beim Anlegen der Geräteinstanz wird automatisch auch der benötigte Multicast Socket angelegt und vorkonfiguriert (Port 9522, Multicast-IP 239.12.255.254).
 ![MulticastSocket.png](imgs/MulticastSocket.png)
 
 Als Sende-Host ist der Name oder die IP-Adresse des Home Manager anzugeben, als Empf.-Host der Name oder die IP-Adresse des Symcon Servers.
@@ -55,11 +56,15 @@ Es werden alle Messkanäle angelegt, die im
 Dokument [SMA Energy Meter - Zählerprotokoll](https://cdn.sma.de/fileadmin/content/www.developer.sma.de/docs/EMETER-Protokoll-TI-en-10.pdf)
 beschrieben sind.
 
+Zusätzlich zu den Messwerten werden folgende Informationsvariablen angelegt:
+- **SW-Version**: Die aktuell installierte Firmware-Version des SMA Gerätes.
+- **Serial Number**: Die eindeutige Seriennummer des Gerätes.
+
 #### Statusvariablen
 
 #### Profile
 
-Es werden nur Standardprofile benutzt.
+Es werden keine Profile benutzt.
 
 ### 6. PHP-Befehlsreferenz
 

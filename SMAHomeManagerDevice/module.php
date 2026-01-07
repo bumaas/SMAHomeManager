@@ -1,442 +1,410 @@
 <?php
 
 declare(strict_types=1);
+
+/**
+ * SMAHomeManagerDevice Klasse
+ *
+ * Dieses Modul wertet die Multicast-Datagramme eines SMA Home Managers oder SMA Energy Meters aus.
+ * Die Daten werden per UDP (Standard-Port 9522) empfangen und in IP-Symcon Variablen geschrieben.
+ */
 class SMAHomeManagerDevice extends IPSModuleStrict
 {
-    private const MODID_MULTICAST_SOCKET          = '{BAB408E0-0A0F-48C3-B14E-9FB2FA81F66A}';
-    private const PROP_SHOW_DETAILED_CHANNELS     = 'ShowDetailedChannels';
-    private const PROP_SHOW_SINGLE_PHASES         = 'ShowSinglePhases';
-    private const PROP_EXTENDED_UPDATE_INTERVAL   = 'ExtendedUpdateInterval';
-    private const PROP_ENTENDED_DEBUG_INFORMATION = 'ExtendedDebugInformation';
+    // Konfigurations-Konstanten
+    private const string MODID_MULTICAST_SOCKET          = '{BAB408E0-0A0F-48C3-B14E-9FB2FA81F66A}';
+    private const string PROP_SERIAL_NUMBER              = 'SerialNumber';
+    private const string PROP_SHOW_DETAILED_CHANNELS     = 'ShowDetailedChannels';
+    private const string PROP_SHOW_SINGLE_PHASES         = 'ShowSinglePhases';
+    private const string PROP_EXTENDED_UPDATE_INTERVAL   = 'ExtendedUpdateInterval';
+    private const string PROP_ENTENDED_DEBUG_INFORMATION = 'ExtendedDebugInformation';
 
-    private const PROFILE_ELECTRICITY_KWH   = 'SMAHM.Electricity.kWh';
-    private const PROFILE_ELECTRICITY_VA    = 'SMAHM.Electricity.VA';
-    private const PROFILE_ELECTRICITY_KVAH  = 'SMAHM.Electricity.kVAh';
-    private const PROFILE_ELECTRICITY_VAR   = 'SMAHM.Electricity.var';
-    private const PROFILE_ELECTRICITY_KVARH = 'SMAHM.Electricity.kvarh';
-
-    // OBIS Parameter
-
-    //Summen
-    private const LIST_SUM = [
-        '00010400' => ['OBIS' => '0140', 'divisor' => 10, 'profile' => '~Watt', 'name' => 'Real Power +', 'detail' => false],
-        '00010800' => [
-            'OBIS'    => '0180',
-            'divisor' => 3600000,
-            'profile' => self::PROFILE_ELECTRICITY_KWH,
-            'name'    => 'Counter Real Power +',
-            'detail'  => false
-        ],
-        '00020400' => ['OBIS' => '0240', 'divisor' => 10, 'profile' => '~Watt', 'name' => 'Real Power -', 'detail' => false],
-        '00020800' => [
-            'OBIS'    => '0280',
-            'divisor' => 3600000,
-            'profile' => self::PROFILE_ELECTRICITY_KWH,
-            'name'    => 'Counter Real Power -',
-            'detail'  => false
-        ],
-        '00030400' => ['OBIS' => '0340', 'divisor' => 10, 'profile' => self::PROFILE_ELECTRICITY_VAR, 'name' => 'Reactive Power +', 'detail' => true],
-        '00030800' => [
-            'OBIS'    => '0380',
-            'divisor' => 3600000,
-            'profile' => self::PROFILE_ELECTRICITY_KVARH,
-            'name'    => 'Counter Reactive Power +',
-            'detail'  => true
-        ],
-        '00040400' => ['OBIS' => '0440', 'divisor' => 10, 'profile' => self::PROFILE_ELECTRICITY_VAR, 'name' => 'Reactive Power -', 'detail' => true],
-        '00040800' => [
-            'OBIS'    => '0480',
-            'divisor' => 3600000,
-            'profile' => self::PROFILE_ELECTRICITY_KVARH,
-            'name'    => 'Counter Reactive Power -',
-            'detail'  => true
-        ],
-        '00090400' => ['OBIS' => '0940', 'divisor' => 10, 'profile' => self::PROFILE_ELECTRICITY_VA, 'name' => 'Apparent Power +', 'detail' => true],
-        '00090800' => [
-            'OBIS'    => '0980',
-            'divisor' => 3600000,
-            'profile' => self::PROFILE_ELECTRICITY_KVAH,
-            'name'    => 'Counter Apparent Power +',
-            'detail'  => true
-        ],
-        '000a0400' => ['OBIS' => '1040', 'divisor' => 10, 'profile' => self::PROFILE_ELECTRICITY_VA, 'name' => 'Apparent Power -', 'detail' => true],
-        '000a0800' => [
-            'OBIS'    => '1080',
-            'divisor' => 3600000,
-            'profile' => self::PROFILE_ELECTRICITY_KVAH,
-            'name'    => 'Counter Apparent Power -',
-            'detail'  => true
-        ],
-        '000d0400' => ['OBIS' => '1340', 'divisor' => 1000, 'profile' => '', 'name' => 'Power Factor', 'detail' => true],
-        '000e0400' => ['OBIS' => '1440', 'divisor' => 1000, 'profile' => '~Hertz.50', 'name' => 'Network Frequency', 'detail' => false]
+    private const array PRESENTATION_INTERVALS_KW = [
+        [
+            'ColorDisplay'     => -1,
+            'IntervalMinValue' => 1000,
+            'IntervalMaxValue' => 999999999,
+            'ConstantActive'   => false,
+            'ConstantValue'    => '',
+            'ConversionFactor' => 1000,
+            'PrefixActive'     => false,
+            'PrefixValue'      => '',
+            'SuffixActive'     => true,
+            'SuffixValue'      => ' kW',
+            'DigitsActive'     => true,
+            'DigitsValue'      => 1,
+            'IconActive'       => false,
+            'IconValue'        => '',
+            'ColorActive'      => false,
+            'ColorValue'       => -1
+        ]
     ];
 
-    private const LIST_L1 = [ //Phase 1
-                              '00150400' => ['OBIS' => '2140', 'divisor' => 10, 'profile' => '~Watt', 'name' => 'Real Power +', 'detail' => false],
-                              '00150800' => [
-                                  'OBIS'    => '2180',
-                                  'divisor' => 3600000,
-                                  'profile' => self::PROFILE_ELECTRICITY_KWH,
-                                  'name'    => 'Counter Real Power +',
-                                  'detail'  => false
-                              ],
-                              '00160400' => ['OBIS' => '2240', 'divisor' => 10, 'profile' => '~Watt', 'name' => 'Real Power -', 'detail' => false],
-                              '00160800' => [
-                                  'OBIS'    => '2280',
-                                  'divisor' => 3600000,
-                                  'profile' => self::PROFILE_ELECTRICITY_KWH,
-                                  'name'    => 'Counter Real Power -',
-                                  'detail'  => false
-                              ],
-                              '00170400' => [
-                                  'OBIS'    => '2340',
-                                  'divisor' => 10,
-                                  'profile' => self::PROFILE_ELECTRICITY_VAR,
-                                  'name'    => 'Reactive Power +',
-                                  'detail'  => true
-                              ],
-                              '00170800' => [
-                                  'OBIS'    => '2380',
-                                  'divisor' => 3600000,
-                                  'profile' => self::PROFILE_ELECTRICITY_KVARH,
-                                  'name'    => 'Counter Reactive Power +',
-                                  'detail'  => true
-                              ],
-                              '00180400' => [
-                                  'OBIS'    => '2440',
-                                  'divisor' => 10,
-                                  'profile' => self::PROFILE_ELECTRICITY_VAR,
-                                  'name'    => 'Reactive Power -',
-                                  'detail'  => true
-                              ],
-                              '00180800' => [
-                                  'OBIS'    => '2480',
-                                  'divisor' => 3600000,
-                                  'profile' => self::PROFILE_ELECTRICITY_KVARH,
-                                  'name'    => 'Counter Reactive Power -',
-                                  'detail'  => true
-                              ],
-                              '001d0400' => [
-                                  'OBIS'    => '2940',
-                                  'divisor' => 10,
-                                  'profile' => self::PROFILE_ELECTRICITY_VA,
-                                  'name'    => 'Apparent Power +',
-                                  'detail'  => true
-                              ],
-                              '001d0800' => [
-                                  'OBIS'    => '2980',
-                                  'divisor' => 3600000,
-                                  'profile' => self::PROFILE_ELECTRICITY_KVAH,
-                                  'name'    => 'Counter Apparent Power +',
-                                  'detail'  => true
-                              ],
-                              '001e0400' => [
-                                  'OBIS'    => '3040',
-                                  'divisor' => 10,
-                                  'profile' => self::PROFILE_ELECTRICITY_VA,
-                                  'name'    => 'Apparent Power -',
-                                  'detail'  => true
-                              ],
-                              '001e0800' => [
-                                  'OBIS'    => '3080',
-                                  'divisor' => 3600000,
-                                  'profile' => self::PROFILE_ELECTRICITY_KVAH,
-                                  'name'    => 'Counter Apparent Power -',
-                                  'detail'  => true
-                              ],
-                              '001f0400' => ['OBIS' => '3140', 'divisor' => 1000, 'profile' => '~Ampere', 'name' => 'Power', 'detail' => false],
-                              '00200400' => ['OBIS' => '3240', 'divisor' => 1000, 'profile' => '~Volt.230', 'name' => 'Voltage', 'detail' => false],
-                              '00210400' => ['OBIS' => '3340', 'divisor' => 1000, 'profile' => '', 'name' => 'Power Factor', 'detail' => true]
+    private const array PRESENTATION_INTERVALS_KWH = [
+        [
+            'ColorDisplay'        => -1,
+            'IntervalMinValue'    => 0,
+            'IntervalMaxValue'    => 1,
+            'ConstantActive'      => false,
+            'ConstantValue'       => '',
+            'ConversionFactor'    => 0.001,
+            'PrefixActive'        => false,
+            'PrefixValue'         => '',
+            'SuffixActive'        => true,
+            'SuffixValue'         => ' Wh',
+            'DigitsActive'        => false,
+            'DigitsValue'         => 0,
+            'IconActive'          => false,
+            'IconValue'           => '',
+            'ColorActive'         => false,
+            'ColorValue'          => -1
+        ]
     ];
 
-    private const LIST_L2 = [ //Phase 2
-                              '00290400' => ['OBIS' => '4140', 'divisor' => 10, 'profile' => '~Watt', 'name' => 'Real Power +', 'detail' => false],
-                              '00290800' => [
-                                  'OBIS'    => '4180',
-                                  'divisor' => 3600000,
-                                  'profile' => self::PROFILE_ELECTRICITY_KWH,
-                                  'name'    => 'Counter Real Power +',
-                                  'detail'  => false
-                              ],
-                              '002a0400' => ['OBIS' => '4240', 'divisor' => 10, 'profile' => '~Watt', 'name' => 'Real Power -', 'detail' => false],
-                              '002a0800' => [
-                                  'OBIS'    => '4280',
-                                  'divisor' => 3600000,
-                                  'profile' => self::PROFILE_ELECTRICITY_KWH,
-                                  'name'    => 'Counter Real Power -',
-                                  'detail'  => false
-                              ],
-                              '002b0400' => [
-                                  'OBIS'    => '4340',
-                                  'divisor' => 10,
-                                  'profile' => self::PROFILE_ELECTRICITY_VAR,
-                                  'name'    => 'Reactive Power +',
-                                  'detail'  => true
-                              ],
-                              '002b0800' => [
-                                  'OBIS'    => '4380',
-                                  'divisor' => 3600000,
-                                  'profile' => self::PROFILE_ELECTRICITY_KVARH,
-                                  'name'    => 'Counter Reactive Power +',
-                                  'detail'  => true
-                              ],
-                              '002c0400' => [
-                                  'OBIS'    => '4440',
-                                  'divisor' => 10,
-                                  'profile' => self::PROFILE_ELECTRICITY_VAR,
-                                  'name'    => 'Reactive Power -',
-                                  'detail'  => true
-                              ],
-                              '002c0800' => [
-                                  'OBIS'    => '4480',
-                                  'divisor' => 3600000,
-                                  'profile' => self::PROFILE_ELECTRICITY_KVARH,
-                                  'name'    => 'Counter Reactive Power -',
-                                  'detail'  => true
-                              ],
-                              '00310400' => [
-                                  'OBIS'    => '4940',
-                                  'divisor' => 10,
-                                  'profile' => self::PROFILE_ELECTRICITY_VA,
-                                  'name'    => 'Apparent Power +',
-                                  'detail'  => true
-                              ],
-                              '00310800' => [
-                                  'OBIS'    => '4980',
-                                  'divisor' => 3600000,
-                                  'profile' => self::PROFILE_ELECTRICITY_KVAH,
-                                  'name'    => 'Counter Apparent Power +',
-                                  'detail'  => true
-                              ],
-                              '00320400' => [
-                                  'OBIS'    => '5040',
-                                  'divisor' => 10,
-                                  'profile' => self::PROFILE_ELECTRICITY_VA,
-                                  'name'    => 'Apparent Power -',
-                                  'detail'  => true
-                              ],
-                              '00320800' => [
-                                  'OBIS'    => '5080',
-                                  'divisor' => 3600000,
-                                  'profile' => self::PROFILE_ELECTRICITY_KVAH,
-                                  'name'    => 'Counter Apparent Power -',
-                                  'detail'  => true
-                              ],
-                              '00330400' => ['OBIS' => '5140', 'divisor' => 1000, 'profile' => '~Ampere', 'name' => 'Power', 'detail' => false],
-                              '00340400' => ['OBIS' => '5240', 'divisor' => 1000, 'profile' => '~Volt.230', 'name' => 'Voltage', 'detail' => false],
-                              '00350400' => ['OBIS' => '5340', 'divisor' => 1000, 'profile' => '', 'name' => 'Power Factor', 'detail' => true]
+    /**
+     * Definition der Messwert-Struktur.
+     * Basierend auf den SMA Protokoll-Spezifikationen (OBIS-ähnliche Struktur).
+     * 'type_byte' identifiziert die Messart im Datenstrom.
+     */
+    private const array MEASUREMENTS = [
+        '0400'           => [
+            'name'      => 'Real Power +',
+            'divisor'   => 10,
+            'suffix'    => ' W',
+            'intervals' => self::PRESENTATION_INTERVALS_KW,
+            'digits'    => 1,
+            'detail'    => false,
+            'type_byte' => 1
+        ],
+        '0800'           => [
+            'name'      => 'Counter Real Power +',
+            'divisor'   => 3600000,
+            'suffix'    => ' kWh',
+            'intervals' => self::PRESENTATION_INTERVALS_KWH,
+            'digits'    => 1,
+            'detail'    => false,
+            'type_byte' => 1
+        ],
+        '0400_neg'       => [
+            'name'      => 'Real Power -',
+            'divisor'   => 10,
+            'suffix'    => ' W',
+            'intervals' => self::PRESENTATION_INTERVALS_KW,
+            'digits'    => 1,
+            'detail'    => false,
+            'type_byte' => 2
+        ],
+        '0800_neg'       => [
+            'name'      => 'Counter Real Power -',
+            'divisor'   => 3600000,
+            'suffix'    => ' kWh',
+            'intervals' => self::PRESENTATION_INTERVALS_KW,
+            'digits'    => 1,
+            'detail'    => false,
+            'type_byte' => 2
+        ],
+        '0400_react_pos' => ['name' => 'Reactive Power +', 'divisor' => 10, 'suffix' => ' var', 'digits' => 1, 'detail' => true, 'type_byte' => 3],
+        '0800_react_pos' => [
+            'name'      => 'Counter Reactive Power +',
+            'divisor'   => 3600000,
+            'suffix'    => ' kvarh',
+            'digits'    => 3,
+            'detail'    => true,
+            'type_byte' => 3
+        ],
+        '0400_react_neg' => ['name' => 'Reactive Power -', 'divisor' => 10, 'suffix' => ' var', 'digits' => 1, 'detail' => true, 'type_byte' => 4],
+        '0800_react_neg' => [
+            'name'      => 'Counter Reactive Power -',
+            'divisor'   => 3600000,
+            'suffix'    => ' kvarh',
+            'digits'    => 3,
+            'detail'    => true,
+            'type_byte' => 4
+        ],
+        '0400_app_pos'   => ['name' => 'Apparent Power +', 'divisor' => 10, 'suffix' => ' VA', 'digits' => 1, 'detail' => true, 'type_byte' => 9],
+        '0800_app_pos'   => [
+            'name'      => 'Counter Apparent Power +',
+            'divisor'   => 3600000,
+            'suffix'    => ' kVAh',
+            'digits'    => 3,
+            'detail'    => true,
+            'type_byte' => 9
+        ],
+        '0400_app_neg'   => ['name' => 'Apparent Power -', 'divisor' => 10, 'suffix' => ' VA', 'digits' => 1, 'detail' => true, 'type_byte' => 10],
+        '0800_app_neg'   => [
+            'name'      => 'Counter Apparent Power -',
+            'divisor'   => 3600000,
+            'suffix'    => ' kVAh',
+            'digits'    => 3,
+            'detail'    => true,
+            'type_byte' => 10
+        ],
+        '0400_fac'       => ['name' => 'Power Factor', 'divisor' => 1000, 'suffix' => '', 'digits' => 3, 'detail' => true, 'type_byte' => 13],
     ];
 
-    private const LIST_L3 = [ //Phase 3
-                              '003d0400' => ['OBIS' => '6140', 'divisor' => 10, 'profile' => '~Watt', 'name' => 'Real Power +', 'detail' => false],
-                              '003d0800' => [
-                                  'OBIS'    => '6180',
-                                  'divisor' => 3600000,
-                                  'profile' => self::PROFILE_ELECTRICITY_KWH,
-                                  'name'    => 'Counter Real Power +',
-                                  'detail'  => false
-                              ],
-                              '003e0400' => ['OBIS' => '6240', 'divisor' => 10, 'profile' => '~Watt', 'name' => 'Real Power -', 'detail' => false],
-                              '003e0800' => [
-                                  'OBIS'    => '6280',
-                                  'divisor' => 3600000,
-                                  'profile' => self::PROFILE_ELECTRICITY_KWH,
-                                  'name'    => 'Counter Real Power -',
-                                  'detail'  => false
-                              ],
-                              '003f0400' => [
-                                  'OBIS'    => '6340',
-                                  'divisor' => 10,
-                                  'profile' => self::PROFILE_ELECTRICITY_VAR,
-                                  'name'    => 'Reactive Power +',
-                                  'detail'  => true
-                              ],
-                              '003f0800' => [
-                                  'OBIS'    => '6380',
-                                  'divisor' => 3600000,
-                                  'profile' => self::PROFILE_ELECTRICITY_KVARH,
-                                  'name'    => 'Counter Reactive Power +',
-                                  'detail'  => true
-                              ],
-                              '00400400' => [
-                                  'OBIS'    => '6440',
-                                  'divisor' => 10,
-                                  'profile' => self::PROFILE_ELECTRICITY_VAR,
-                                  'name'    => 'Reactive Power -',
-                                  'detail'  => true
-                              ],
-                              '00400800' => [
-                                  'OBIS'    => '6480',
-                                  'divisor' => 3600000,
-                                  'profile' => self::PROFILE_ELECTRICITY_KVARH,
-                                  'name'    => 'Counter Reactive Power -',
-                                  'detail'  => true
-                              ],
-                              '00450400' => [
-                                  'OBIS'    => '6940',
-                                  'divisor' => 10,
-                                  'profile' => self::PROFILE_ELECTRICITY_VA,
-                                  'name'    => 'Apparent Power +',
-                                  'detail'  => true
-                              ],
-                              '00450800' => [
-                                  'OBIS'    => '6980',
-                                  'divisor' => 3600000,
-                                  'profile' => self::PROFILE_ELECTRICITY_KVAH,
-                                  'name'    => 'Counter Apparent Power +',
-                                  'detail'  => true
-                              ],
-                              '00460400' => [
-                                  'OBIS'    => '7040',
-                                  'divisor' => 10,
-                                  'profile' => self::PROFILE_ELECTRICITY_VA,
-                                  'name'    => 'Apparent Power -',
-                                  'detail'  => true
-                              ],
-                              '00460800' => [
-                                  'OBIS'    => '7080',
-                                  'divisor' => 3600000,
-                                  'profile' => self::PROFILE_ELECTRICITY_KVAH,
-                                  'name'    => 'Counter Apparent Power -',
-                                  'detail'  => true
-                              ],
-                              '00470400' => ['OBIS' => '7140', 'divisor' => 1000, 'profile' => '~Ampere', 'name' => 'Power', 'detail' => false],
-                              '00480400' => ['OBIS' => '7240', 'divisor' => 1000, 'profile' => '~Volt.230', 'name' => 'Voltage', 'detail' => false],
-                              '00490400' => ['OBIS' => '7340', 'divisor' => 1000, 'profile' => '', 'name' => 'Power Factor', 'detail' => true]
-    ];
-
-    private const POSITION_STEP = 10;
+    private const int POSITION_STEP = 10;
 
     public function Create(): void
     {
-        //Never delete this line!
+        // Initialisierung der Instanz-Eigenschaften
         parent::Create();
-
+        $this->RegisterPropertyString(self::PROP_SERIAL_NUMBER, '');
         $this->RegisterPropertyBoolean(self::PROP_SHOW_DETAILED_CHANNELS, false);
         $this->RegisterPropertyBoolean(self::PROP_SHOW_SINGLE_PHASES, false);
         $this->RegisterPropertyInteger(self::PROP_EXTENDED_UPDATE_INTERVAL, 0);
         $this->RegisterPropertyBoolean(self::PROP_ENTENDED_DEBUG_INFORMATION, false);
-
-        $this->RequireParent(self::MODID_MULTICAST_SOCKET);
     }
 
-    private function CreateProfiles(): void
+    public function GetCompatibleParents(): string
     {
-        if (!IPS_VariableProfileExists(self::PROFILE_ELECTRICITY_KWH)) {
-            IPS_CreateVariableProfile(self::PROFILE_ELECTRICITY_KWH, VARIABLETYPE_FLOAT);
-            IPS_SetVariableProfileText(self::PROFILE_ELECTRICITY_KWH, '', ' kWh');
-        }
-        if (!IPS_VariableProfileExists(self::PROFILE_ELECTRICITY_VAR)) {
-            IPS_CreateVariableProfile(self::PROFILE_ELECTRICITY_VAR, VARIABLETYPE_FLOAT);
-            IPS_SetVariableProfileText(self::PROFILE_ELECTRICITY_VAR, '', ' var');
-            IPS_SetVariableProfileDigits(self::PROFILE_ELECTRICITY_VAR, 1);
-        }
-        if (!IPS_VariableProfileExists(self::PROFILE_ELECTRICITY_KVARH)) {
-            IPS_CreateVariableProfile(self::PROFILE_ELECTRICITY_KVARH, VARIABLETYPE_FLOAT);
-            IPS_SetVariableProfileText(self::PROFILE_ELECTRICITY_KVARH, '', ' kvarh');
-        }
-        if (!IPS_VariableProfileExists(self::PROFILE_ELECTRICITY_VA)) {
-            IPS_CreateVariableProfile(self::PROFILE_ELECTRICITY_VA, VARIABLETYPE_FLOAT);
-            IPS_SetVariableProfileText(self::PROFILE_ELECTRICITY_VA, '', ' VA');
-            IPS_SetVariableProfileDigits(self::PROFILE_ELECTRICITY_VA, 1);
-        }
-        if (!IPS_VariableProfileExists(self::PROFILE_ELECTRICITY_KVAH)) {
-            IPS_CreateVariableProfile(self::PROFILE_ELECTRICITY_KVAH, VARIABLETYPE_FLOAT);
-            IPS_SetVariableProfileText(self::PROFILE_ELECTRICITY_KVAH, '', ' kVAh');
-        }
-    }
-
-    private function RegisterVariables(): void
-    {
-        $this->registerChannelVariablesFromList('SUM', self::LIST_SUM, 10);
-
-        if ($this->ReadPropertyBoolean(self::PROP_SHOW_SINGLE_PHASES)) {
-            $this->registerChannelVariablesFromList('L1', self::LIST_L1, 300);
-            $this->registerChannelVariablesFromList('L2', self::LIST_L2, 500);
-            $this->registerChannelVariablesFromList('L3', self::LIST_L3, 700);
-        }
-        $this->RegisterVariableString('SW_VERSION', $this->Translate('SW-Version'), '', 1000);
-    }
-
-    private function registerChannelVariablesFromList(string $prefix, array $list, int $initialPosition): void
-    {
-        $position = $initialPosition;
-        foreach ($list as $channel) {
-            $this->RegisterChannelVariable($prefix, $channel, $position);
-            $position += self::POSITION_STEP;
-        }
-    }
-
-    private function RegisterChannelVariable(string $prefix, array $channel, int $position): void
-    {
-        if (!$channel['detail'] || $this->ReadPropertyBoolean(self::PROP_SHOW_DETAILED_CHANNELS)) {
-            $ident = $this->getIdent($prefix, $channel['name']);
-            $this->RegisterVariableFloat($ident, $this->getModifiedName($prefix, $channel['name']), $channel['profile'], $position);
-        }
-    }
-
-    private function getModifiedName(string $prefix, string $name): string
-    {
-        $suffix        = $this->getSuffix($name);
-        $cleanedString = str_replace([' +', ' -'], '', $name);
-
-        $translatedString = $this->Translate($cleanedString);
-
-        if ($prefix !== 'SUM') {
-            return $prefix . ' ' . $translatedString . $suffix;
-        }
-
-        return $translatedString . $suffix;
-    }
-
-    private function getSuffix(string $name): string
-    {
-        if (str_contains($name, ' +')) {
-            return ' +';
-        }
-
-        if (str_contains($name, ' -')) {
-            return ' -';
-        }
-
-        return '';
-    }
-
-    private function getIdent(string $prefix, string $name): string
-    {
-        $name = str_replace(['+', '-'], ['pos', 'neg'], $name);
-        return $prefix . '_' . preg_replace('/[^a-z0-9_]/i', '_', $name); //alles bis auf a-z, A-Z, 0-9 und '_' durch '_' ersetzen
+        // Definiert, dass dieses Modul an einen Multicast-Socket (UDP) angeschlossen werden möchte
+        return json_encode([
+                               'type'      => 'connect',
+                               'moduleIDs' => [self::MODID_MULTICAST_SOCKET]
+                           ],
+                           JSON_THROW_ON_ERROR);
     }
 
     public function ApplyChanges(): void
     {
-        $this->CreateProfiles();
+        // Wird aufgerufen, wenn die Konfiguration im UI gespeichert wird
         $this->RegisterVariables();
-
         $this->SetStatus(IS_ACTIVE);
-
-        //Never delete this line!
         parent::ApplyChanges();
+    }
+
+    private function RegisterVariables(): void
+    {
+        // Registriert alle Variablen basierend auf der dynamischen Lookup-Map
+        $lookup = $this->getLookupMap();
+        foreach ($lookup as $entry) {
+            $config = $entry['config'];
+            if (!$config['detail'] || $this->ReadPropertyBoolean(self::PROP_SHOW_DETAILED_CHANNELS)) {
+                $ident = $this->getIdent($entry['prefix'], $config['name']);
+                $name  = $this->getModifiedName($entry['prefix'], $config['name']);
+
+                // Aufbau der modernen Darstellungs-Parameter
+                $presentation = [
+                    'PRESENTATION' => VARIABLE_PRESENTATION_VALUE_PRESENTATION
+                ];
+
+                if (isset($config['suffix'])) {
+                    $presentation['SUFFIX'] = $config['suffix'];
+                }
+
+                if (isset($config['digits'])) {
+                    $presentation['DIGITS'] = $config['digits'];
+                }
+
+                if (isset($config['intervals'])) {
+                    $presentation['INTERVALS']        = json_encode($config['intervals'], JSON_THROW_ON_ERROR);
+                    $presentation['INTERVALS_ACTIVE'] = true;
+                }
+
+                $this->RegisterVariableFloat($ident, $name, $presentation, $entry['pos']);
+            }
+        }
+
+        // Frequenz mit moderner Darstellung
+        $this->RegisterVariableFloat($this->getIdent('SUM', 'Network Frequency'), $this->Translate('Network Frequency'), [
+            'PRESENTATION' => VARIABLE_PRESENTATION_VALUE_PRESENTATION,
+            'SUFFIX'       => ' Hz',
+            'DIGITS'       => 2
+        ],                           150);
+
+        $this->RegisterVariableString('SW_VERSION', $this->Translate('SW-Version'), '', 1000);
+        $this->RegisterVariableString('SERIAL_NUMBER', $this->Translate('Serial Number'), '', 1010);
+    }
+
+    private function getLookupMap(): array
+    {
+        // Generiert eine Map der OBIS-Identifier (als Hex-String) zu Konfigurationsdaten
+        $map = [];
+        $pos = 10;
+
+        // Summen-Werte (Gesamtverbrauch/-einspeisung über alle Phasen)
+        foreach (self::MEASUREMENTS as $key => $m) {
+            $id       = '00' . str_pad(dechex($m['type_byte']), 2, '0', STR_PAD_LEFT) . (str_contains($key, '0800') ? '0800' : '0400');
+            $map[$id] = ['prefix' => 'SUM', 'config' => $m, 'pos' => $pos];
+            $pos      += self::POSITION_STEP;
+        }
+        $map['000e0400'] = [
+            'prefix' => 'SUM',
+            'config' => ['name' => 'Network Frequency', 'divisor' => 1000, 'profile' => '~Hertz.50', 'detail' => false],
+            'pos'    => 150
+        ];
+
+        // Einzelphasen-Werte (L1, L2, L3) falls in den Instanzeinstellungen aktiviert
+        if ($this->ReadPropertyBoolean(self::PROP_SHOW_SINGLE_PHASES)) {
+            $phases = [
+                'L1' => ['offset' => 20, 'pos' => 300, 'p_id' => '1f', 'v_id' => '20'],
+                'L2' => ['offset' => 40, 'pos' => 500, 'p_id' => '33', 'v_id' => '34'],
+                'L3' => ['offset' => 60, 'pos' => 700, 'p_id' => '47', 'v_id' => '48']
+            ];
+            foreach ($phases as $prefix => $pInfo) {
+                $pos = $pInfo['pos'];
+                foreach (self::MEASUREMENTS as $key => $m) {
+                    $typeByte = str_pad(dechex($m['type_byte'] + $pInfo['offset']), 2, '0', STR_PAD_LEFT);
+                    $id       = '00' . $typeByte . (str_contains($key, '0800') ? '0800' : '0400');
+                    $map[$id] = ['prefix' => $prefix, 'config' => $m, 'pos' => $pos];
+                    $pos      += self::POSITION_STEP;
+                }
+
+                // Die IDs für Strom und Spannung sind im Protokoll fest definiert (OBIS 31, 32, 51, 52, 71, 72 dezimal)
+                $typePower   = str_pad(dechex($pInfo['offset'] + 11), 2, '0', STR_PAD_LEFT); // OBIS 31, 51, 71
+                $typeVoltage = str_pad(dechex($pInfo['offset'] + 12), 2, '0', STR_PAD_LEFT); // OBIS 32, 52, 72
+                $typeFactor  = str_pad(dechex($pInfo['offset'] + 13), 2, '0', STR_PAD_LEFT); // OBIS 33, 53, 73
+
+                $map['00' . $typePower . '0400']   = [
+                    'prefix' => $prefix,
+                    'config' => ['name' => 'Power', 'divisor' => 1000, 'suffix' => ' A',
+                                 'digits' => 3, 'detail' => false],
+                    'pos'    => $pos + 10
+                ];
+                $map['00' . $typeVoltage . '0400'] = [
+                    'prefix' => $prefix,
+                    'config' => ['name' => 'Voltage', 'divisor' => 1000, 'suffix' => ' V', 'digits' => 2, 'detail' => false],
+                    'pos'    => $pos + 20
+                ];
+                $map['00' . $typeFactor . '0400']  = [
+                    'prefix' => $prefix,
+                    'config' => ['name' => 'Power Factor', 'divisor' => 1000, 'digits' => 3, 'detail' => true],
+                    'pos'    => $pos + 30
+                ];
+            }
+        }
+        return $map;
     }
 
     public function ReceiveData($JSONString): string
     {
-        $data = json_decode($JSONString, true, 512, JSON_THROW_ON_ERROR);
-        if ($this->ReadPropertyBoolean(self::PROP_ENTENDED_DEBUG_INFORMATION)) {
-            $this->SendDebug(
-                sprintf('%s (%s:%s, %s)', __FUNCTION__, $data['ClientIP'], $data['ClientPort'], $data['DataID']),
-                $data['Buffer'],
-                0
-            );
+        // Verarbeitet die vom Parent-Socket eintreffenden Datenpakete
+        $interval = $this->ReadPropertyInteger(self::PROP_EXTENDED_UPDATE_INTERVAL);
+        if ($interval > 0) {
+            // Prüfung des Aktualisierungsintervalls zur Drosselung der Datenflut
+            $last = (int)$this->GetBuffer('LastUpdate');
+            if ($last > (time() - $interval)) {
+                return '';
+            }
+            $this->SetBuffer('LastUpdate', (string)time());
         }
+
+        $data = json_decode($JSONString, true, 512, JSON_THROW_ON_ERROR);
         $this->processData($data['Buffer']);
         return '';
     }
 
+    /**
+     * Verarbeitet die empfangenen RAW-Daten des SMA Geräts.
+     * Das Paket wird nach dem SMA-Net-Protokoll (Header + OBIS-Datenstrom) zerlegt.
+     *
+     * @param string $hraw Der hex-kodierte Datenstrom vom Multicast-Socket.
+     *
+     * @return void
+     */
+    private function processData(string $hraw): void
+    {
+        // Debugging-Ausgabe des gesamten Hex-Strings zur Fehleranalyse
+        if ($this->ReadPropertyBoolean(self::PROP_ENTENDED_DEBUG_INFORMATION)) {
+            $this->SendDebug('RAW', $hraw, 0);
+        }
+
+        // Mindestlänge prüfen (SMA Header ist mind. 28 Bytes = 56 Zeichen lang)
+        if (strlen($hraw) < 56) {
+            return;
+        }
+
+        // Die Seriennummer steht laut Doku im Header (4 Bytes ab Byte 20)
+        // Byte 18-19: SUSy ID (z.B. 270 = 010e), Byte 20-23: Seriennummer
+        $serialHex     = substr($hraw, 20 * 2, 4 * 2);
+        $currentSerial = (string)hexdec($serialHex);
+
+        // Filter: Nur verarbeiten, wenn die Seriennummer übereinstimmt (oder keine konfiguriert ist)
+        $configuredSerial = $this->ReadPropertyString(self::PROP_SERIAL_NUMBER);
+        if ($configuredSerial !== '' && $configuredSerial !== $currentSerial) {
+            return;
+        }
+
+        // Wenn noch keine Seriennummer konfiguriert war, setzen wir sie einmalig zur Info
+        $this->SetValue('SERIAL_NUMBER', $currentSerial);
+
+        // SMA Protokoll 6069 Check (SMA Net): Andere Protokoll-IDs werden ignoriert
+        $protokollID = strtolower(substr($hraw, 32, 4));
+        if ($protokollID !== '6069') {
+            return;
+        }
+
+        $lookup = $this->getLookupMap();
+        $offset = 28; // Datenbereich beginnt nach dem SMA Header
+
+        // Iteration durch den Datenstrom (Tag-Length-Value Format)
+        while ($offset < strlen($hraw) / 2) {
+            $id = strtolower(substr($hraw, $offset * 2, 8));
+            // Ende des Pakets oder ungültige ID erreicht
+            if ($id === '00000000' || strlen($id) < 8) {
+                break;
+            }
+
+            $offset += 4;
+            $valLen = hexdec(substr($id, 4, 2)); // Länge des Werts (z.B. 4 Bytes für Momentanwerte, 8 für Zähler)
+
+            if (isset($lookup[$id])) {
+                // Wert aus Hex extrahieren
+                $entry  = $lookup[$id];
+                $config = $entry['config'];
+
+                // Nur speichern, wenn die Variable auch wirklich existiert
+                // (Detail-Variablen sind nur vorhanden, wenn die Eigenschaft gesetzt ist)
+                if (!$config['detail'] || $this->ReadPropertyBoolean(self::PROP_SHOW_DETAILED_CHANNELS)) {
+                    $ident    = $this->getIdent($entry['prefix'], $config['name']);
+                    $hexValue = substr($hraw, $offset * 2, $valLen * 2);
+                    $this->SetValue($ident, hexdec($hexValue) / $config['divisor']);
+                }
+            } elseif ($id === '90000000') {
+                // Spezialbehandlung für Software-Version
+                $sw    = substr($hraw, $offset * 2, 8);
+                $swStr = sprintf(
+                    '%d.%d.%d.%s',
+                    hexdec(substr($sw, 0, 2)),
+                    hexdec(substr($sw, 2, 2)),
+                    hexdec(substr($sw, 4, 2)),
+                    chr(hexdec(substr($sw, 6, 2)))
+                );
+                $this->SetValue('SW_VERSION', $swStr);
+            }
+            $offset += $valLen;
+        }
+    }
+
+    private function getIdent(string $prefix, string $name): string
+    {
+        // Erzeugt einen gültigen IPS-Ident aus Prefix und Name
+        $name = str_replace(['+', '-'], ['pos', 'neg'], $name);
+        return $prefix . '_' . preg_replace('/[^a-z0-9_]/i', '_', $name);
+    }
+
+    private function getModifiedName(string $prefix, string $name): string
+    {
+        // Formatiert den Anzeigenamen der Variable und übersetzt ihn
+        $suffix = match (true) {
+            str_ends_with($name, ' +') => ' +',
+            str_ends_with($name, ' -') => ' -',
+            default => ''
+        };
+
+        $cleaned = $suffix === '' ? $name : substr($name, 0, -strlen($suffix));
+        $trans   = $this->Translate($cleaned);
+
+        $parts = ($prefix === 'SUM') ? [$trans, $suffix] : [$prefix, $trans . $suffix];
+
+        return implode(' ', array_filter($parts, 'strlen'));
+    }
+
     public function GetConfigurationForParent(): string
     {
+        // Setzt beim Verbinden automatisch die korrekten Multicast-Parameter im UDP-Socket
         return json_encode([
-                               'Port'               => 9522,
+                               'Host'               => '',
+                               'Port'               => 0,
                                'BindPort'           => 9522,
                                'MulticastIP'        => '239.12.255.254',
                                'EnableBroadcast'    => false,
@@ -444,195 +412,5 @@ class SMAHomeManagerDevice extends IPSModuleStrict
                                'EnableLoopback'     => false
                            ],
                            JSON_THROW_ON_ERROR);
-    }
-
-    private function processData(string $hraw): void
-    {
-//        $hraw = '534d4100000402a000000001024c0010606901f5b3b8f0ccb40a28ee00010400000000000001080000000001398f2c280002040000015923000208000000000c6bad6f98000304000000042700030800000000002f2071a8000404000000000000040800000000038a83f1c00009040000000000000908000000000207f7fa40000a04000001592a000a08000000000e32bfa9b0000d0400000003e8000e04000000c36f00150400000000000015080000000002160cf0180016040000006c3d00160800000000041f0b0c98001704000000029d001708000000000014d34c08001804000000000000180800000000019b47ccb8001d040000000000001d08000000000260c687b8001e040000006c45001e0800000000047bb9d668001f040000002c79002004000003b8be00210400000003e80029040000000000002908000000000097f628d0002a0400000077ea002a0800000000053ba6b680002b040000000312002b08000000000044f85090002c040000000000002c080000000000b3e6b70800310400000000000031080000000001087d1bb800320400000077f400320800000000054b48eab8003304000000313f003404000003b7e100350400000003e8003d040000000000003d080000000000be7e2408003e0400000074fd003e08000000000543edc2e8003f040000000000003f08000000000009a76148004004000000018800400800000000016fa7fa38004504000000000000450800000000016556b1a000460400000074ff004608000000000559c793a0004704000000306a004804000003b10900490400000003e890000000020e0d5200000000';
-//        $hraw = '534d4100 0004 02a0 0000 0001 024c 0010 6069 01f5b3b8f0cc b40a28ee 0001 0400000000000001080000000001398f2c280002040000015923000208000000000c6bad6f98000304000000042700030800000000002f2071a8000404000000000000040800000000038a83f1c00009040000000000000908000000000207f7fa40000a04000001592a000a08000000000e32bfa9b0000d0400000003e8000e04000000c36f00150400000000000015080000000002160cf0180016040000006c3d00160800000000041f0b0c98001704000000029d001708000000000014d34c08001804000000000000180800000000019b47ccb8001d040000000000001d08000000000260c687b8001e040000006c45001e0800000000047bb9d668001f040000002c79002004000003b8be00210400000003e80029040000000000002908000000000097f628d0002a0400000077ea002a0800000000053ba6b680002b040000000312002b08000000000044f85090002c040000000000002c080000000000b3e6b70800310400000000000031080000000001087d1bb800320400000077f400320800000000054b48eab8003304000000313f003404000003b7e100350400000003e8003d040000000000003d080000000000be7e2408003e0400000074fd003e08000000000543edc2e8003f040000000000003f08000000000009a76148004004000000018800400800000000016fa7fa38004504000000000000450800000000016556b1a000460400000074ff004608000000000559c793a0004704000000306a004804000003b10900490400000003e890000000020e0d5200000000';
-//        $hraw = '534d4100 0004 02a0 0000 0001 0042 0010 6073 3f88e87ff9d58ec4cd90d199e6246b36982ed0708fc4a4b695d81bd867d51822845594b74123621ae28c2d7e5ea4a05d750c256c948b7371c48b77df0256814200000000';
-//        $hraw = '534d4100000402a0000000010042001060733f88e87ff9d58ec4cd90d199e6246b36982ed0708fc4a4b695d81bd867d51822845594b74123621ae28c2d7e5ea4a05d750c256c948b7371c48b77df0256814200000000';
-//        $hraw = '534d4100000402a000000001024c0010606901f5b3b8e03e759d94ac000104000000114d0001080000000002e34b989000020400000000000002080000000016ea03b6900003040000000000000308000000000008a9a53000040400000022a50004080000000007a7d6036800090400000026ba0009080000000006cc548148000a040000000000000a08000000001740584178000d0400000001bf000e04000000c35e001504000000066f00150800000000014bbe362800160400000000000016080000000007bc018588001704000000000000170800000000000255d2300018040000000bba001808000000000309aca9e8001d040000000d61001d080000000002b797ff90001e040000000000001e080000000007e3f60e88001f04000000064f0020040000039ea800210400000001e1002904000000058c00290800000000012ddfe5c0002a040000000000002a0800000000077335bf90002b040000000000002b08000000000012371a60002c040000000c9a002c080000000002a4f439580031040000000dc5003108000000000288a55868003204000000000000320800000000079584dc98003304000000062c0034040000039fa10035040000000193003d040000000551003d080000000000cfff8d48003e040000000000003e080000000008211e7b10003f040000000000003f0800000000001ab5b9d00040040000000a5100400800000000021fce24280045040000000b9b00450800000000020ff7c0900046040000000000004608000000000836936e380047040000000526004804000003a98b00490400000001ca90000000020f065200000000';
-        $this->SendDebug(sprintf('%s (%s)', __FUNCTION__, 'hraw'), $hraw, 0);
-
-        //Erkennungsstring
-        $offset = 0;
-        $len    = 4;
-        if ($this->ReadPropertyBoolean(self::PROP_ENTENDED_DEBUG_INFORMATION)) {
-            $this->SendDebug(sprintf('%s (%s:%s)', __FUNCTION__, $offset, 'Erkennungsstring')
-                , sprintf('%s (HEX: %s)', hex2bin(substr($hraw, $offset * 2, $len * 2)), substr($hraw, $offset * 2, $len * 2)), 0);
-        }
-
-        //Datenlänge/Tag
-        $offset += $len;
-        $len = 2;
-        $dataLen = hexdec(substr($hraw, $offset * 2, $len * 2));
-        if ($this->ReadPropertyBoolean(self::PROP_ENTENDED_DEBUG_INFORMATION)) {
-            $this->SendDebug(
-                sprintf('%s (%s:%s)', __FUNCTION__, $offset, 'Datenlänge'),
-                (string)$dataLen,
-                0
-            );
-        }
-
-        //Tag
-        $offset += $len;
-        $len = $dataLen;
-        if ($this->ReadPropertyBoolean(self::PROP_ENTENDED_DEBUG_INFORMATION)) {
-            $this->SendDebug(sprintf('%s (%s)', __FUNCTION__, 'Tag')
-                , substr($hraw, ($offset) * 2, $len * 2) , 0);
-        }
-
-        //gruppe
-        $offset += $len;
-        $len    = 2;
-        if ($this->ReadPropertyBoolean(self::PROP_ENTENDED_DEBUG_INFORMATION)) {
-            $this->SendDebug(sprintf('%s (%s:%s)', __FUNCTION__, $offset, 'Gruppe')
-                , sprintf('%s',substr($hraw, $offset * 2, $len * 2)), 0);
-        }
-
-        //Datenlänge
-        $offset += $len;
-        $len = 2;
-        $dataLen = hexdec(substr($hraw, $offset * 2, $len * 2));
-        if ($this->ReadPropertyBoolean(self::PROP_ENTENDED_DEBUG_INFORMATION)) {
-            $this->SendDebug(
-                sprintf('%s (%s:%s)', __FUNCTION__, $offset, 'Datenlänge'),
-                (string)$dataLen,
-                0
-            );
-        }
-
-        //Tag
-        $offset += $len;
-        $len = 2;
-        if ($this->ReadPropertyBoolean(self::PROP_ENTENDED_DEBUG_INFORMATION)) {
-            $this->SendDebug(
-                sprintf('%s (%s:%s)', __FUNCTION__, $offset, 'Tag'),
-                sprintf('%s', substr($hraw, $offset * 2, $len * 2)),
-                0
-            );
-        }
-
-        //ProtokollID
-        $offset      += $len;
-        $len         = 2;
-        $protokollID = substr($hraw, $offset * 2, $len * 2);
-        if ($this->ReadPropertyBoolean(self::PROP_ENTENDED_DEBUG_INFORMATION)) {
-            $this->SendDebug(sprintf('%s (%s:%s)', __FUNCTION__, $offset, 'ProtokollID'), sprintf('%s', $protokollID), 0);
-        }
-
-        //wir interessieren uns nur für das Protokoll 6069. Andere sind nicht dokumentiert
-        if ($protokollID !== '6069') {
-            $this->SendDebug(sprintf('%s (%s:%s)', __FUNCTION__, $offset, 'ProtokollID')
-                , sprintf('%s - ignored - ',substr($hraw, $offset * 2, $len * 2)), 0);
-            return;
-        }
-
-        //zaehlerkennung
-        $offset += $len;
-        $len    = 6;
-        if ($this->ReadPropertyBoolean(self::PROP_ENTENDED_DEBUG_INFORMATION)) {
-            $this->SendDebug(sprintf('%s (%s:%s)', __FUNCTION__, $offset, 'Zählerkennung'), substr($hraw, $offset * 2, $len * 2), 0);
-        }
-
-        //Messzeitpunkt
-        $offset += $len;
-        $len    = 4;
-        if ($this->ReadPropertyBoolean(self::PROP_ENTENDED_DEBUG_INFORMATION)) {
-            $this->SendDebug(sprintf('%s (%s:%s)', __FUNCTION__, $offset, 'Messzeitpunkt'), base_convert(substr($hraw, $offset * 2, $len * 2), 16, 10), 0);
-        }
-
-        $offset   += $len;
-        $finished = false;
-
-        while (!$finished) {
-            //obis Id
-            $len = 4;
-            $id  = strtolower(substr($hraw, $offset * 2, $len * 2));
-            if ($this->ReadPropertyBoolean(self::PROP_ENTENDED_DEBUG_INFORMATION)) {
-                $this->SendDebug(sprintf('%s (%s:%s)', __FUNCTION__, $offset, 'id'), $id, 0);
-            }
-
-            //echo $id . PHP_EOL;
-            if (in_array($id, ['00000000', ''])) {
-                $finished = true;
-                continue;
-            }
-            $offset += $len;
-
-            //obis Messwert
-            $len = (int)substr($id, 2 * 2, 2); //die Länge entspricht der Messart (Byte 2)
-
-            if (isset(self::LIST_SUM[$id])) {
-                $this->setValueFromHexAndList($id, $hraw, $offset, $len, 'SUM', self::LIST_SUM);
-            } elseif (isset(self::LIST_L1[$id])) {
-                $this->setValueFromHexAndList($id, $hraw, $offset, $len, 'L1', self::LIST_L1);
-            } elseif (isset(self::LIST_L2[$id])) {
-                $this->setValueFromHexAndList($id, $hraw, $offset, $len, 'L2', self::LIST_L2);
-            } elseif (isset(self::LIST_L3[$id])) {
-                $this->setValueFromHexAndList($id, $hraw, $offset, $len, 'L3', self::LIST_L3);
-            } elseif ($id === '90000000') {
-                $len       = 4;
-                $swVersion = substr($hraw, $offset * 2, $len * 2);
-                $swVersion = sprintf(
-                    '%s.%s.%s.%s',
-                    hexdec(substr($swVersion, 0, 2)),
-                    hexdec(substr($swVersion, 2, 2)),
-                    hexdec(substr($swVersion, 4, 2)),
-                    chr(hexdec(substr($swVersion, 6, 2)))
-                );
-
-                $this->SendDebug(
-                    sprintf('%s (%s)', __FUNCTION__, 'SW-Version'),
-                    $swVersion,
-                    0
-                );
-                //$this->setValue('SW_VERSION', $swVersion);
-            } else {
-                trigger_error(sprintf('id \'%s\' (Len=%s) unbekannt, hraw: %s', $id, strlen($id), $hraw));
-                $finished = true;
-            }
-            $offset += $len;
-        }
-    }
-
-    private function getSubstringFromHex(string $hraw, int $offset, int $len): string
-    {
-        return substr($hraw, $offset * 2, $len * 2);
-    }
-
-    private function setValueFromHexAndList(string $obisID, string $hraw, int $offset, int $len, string $prefix, array $list): void
-    {
-        $ident = $this->getIdent($prefix, $list[$obisID]['name']);
-        $value = base_convert($this->getSubstringFromHex($hraw, $offset, $len), 16, 10) / $list[$obisID]['divisor'];
-
-        if ($this->ReadPropertyBoolean(self::PROP_ENTENDED_DEBUG_INFORMATION)) {
-            $this->SendDebug(
-                sprintf('%s (%s)', __FUNCTION__, $obisID),
-                sprintf(
-                    '%s: %s, %s, %s -> %s: %s',
-                    $prefix,
-                    (int)$this->ReadPropertyBoolean(self::PROP_SHOW_SINGLE_PHASES),
-                    (int)$this->ReadPropertyBoolean(self::PROP_SHOW_DETAILED_CHANNELS),
-                    (int)$list[$obisID]['detail'],
-                    $ident,
-                    $value
-                ),
-                0
-            );
-        }
-
-        if (($prefix === 'SUM' || $this->ReadPropertyBoolean(self::PROP_SHOW_SINGLE_PHASES))
-            && ($this->ReadPropertyBoolean(self::PROP_SHOW_DETAILED_CHANNELS)
-                || !$list[$obisID]['detail'])) {
-            $reducedUpdateFrequency = $this->ReadPropertyInteger(self::PROP_EXTENDED_UPDATE_INTERVAL);
-            if ($reducedUpdateFrequency > 0
-                && IPS_GetVariable($this->GetIDForIdent($ident))['VariableUpdated'] > (time() - $reducedUpdateFrequency)) {
-                return;
-            }
-
-            $this->SetValue($ident, $value);
-        }
     }
 }
