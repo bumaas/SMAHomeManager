@@ -7,7 +7,7 @@ Beschreibung des Moduls.
 1. [Funktionsumfang](#1-funktionsumfang)
 2. [Voraussetzungen](#2-voraussetzungen)
 3. [Software-Installation](#3-software-installation)
-4. [Einrichten der Instanzen in IP-Symcon](#4-einrichten-der-instanzen-in-ip-symcon)
+4. [Einrichten der Instanzen in Symcon](#4-einrichten-der-instanzen-in-symcon)
 5. [Statusvariablen und Profile](#5-statusvariablen-und-profile)
 6. [PHP-Befehlsreferenz](#6-php-befehlsreferenz)
 
@@ -18,14 +18,14 @@ Statusvariablen zur Verfügung.
 
 ### 2. Voraussetzungen
 
-- IP-Symcon ab Version 7.0
+- Symcon ab Version 7.0
 
 ### 3. Software-Installation
 
 * Über den Module Store wird das 'SMA Home Manager'-Modul installiert.
 * Alternativ kann über das Module Control folgende URL hinzugefügt werden: https://github.com/bumaas/SMAHomeManager
 
-### 4. Einrichten der Instanzen in IP-Symcon
+### 4. Einrichten der Instanzen in Symcon
 
 Unter 'Instanz hinzufügen' kann das 'SMA Home Manager Device'-Modul mithilfe des Schnellfilters gefunden werden.  
 Allgemeine Informationen zum Hinzufügen von Instanzen gibt es in
@@ -46,7 +46,7 @@ der [Dokumentation der Instanzen](https://www.symcon.de/service/dokumentation/ko
 Beim Anlegen der Geräteinstanz wird automatisch auch der benötigte Multicast Socket angelegt und vorkonfiguriert (Port 9522, Multicast-IP 239.12.255.254).
 ![MulticastSocket.png](imgs/MulticastSocket.png)
 
-Als Sende-Host ist der Name oder die IP-Adresse des Home Manager anzugeben, als Empf.-Host der Name oder die IP-Adresse des Symcon Servers.
+Im Regelfall müssen hier keine manuellen Änderungen vorgenommen werden. Der 'Sende-Host' kann leer bleiben, da die Filterung der Daten direkt im Gerät über die Seriennummer erfolgt.
 
 ### 5. Statusvariablen und Profile
 
@@ -56,7 +56,22 @@ Es werden alle Messkanäle angelegt, die im
 Dokument [SMA Energy Meter - Zählerprotokoll](https://cdn.sma.de/fileadmin/content/www.developer.sma.de/docs/EMETER-Protokoll-TI-en-10.pdf)
 beschrieben sind.
 
-Zusätzlich zu den Messwerten werden folgende Informationsvariablen angelegt:
+Das Modul übersetzt die technischen Messkanäle des SMA-Protokolls automatisch in lesbare Bezeichnungen. Besonders bei den Summenwerten (SUM) werden folgende Spezialbezeichnungen verwendet:
+
+| SMA-Kanal (Protokoll) | Bezeichnung in Symcon (Beispiel) | Beschreibung |
+|-----------------------|-----------------------------------|--------------|
+| Real Power +          | Netzbezug (Wirkleistung(+) gesamt)| Aktuelle Wirkleistung, die vom Netz bezogen wird. |
+| Real Power -          | Netzeinspeisung (Wirkleistung(-) gesamt)| Aktuelle Wirkleistung, die ins Netz eingespeist wird. |
+| Counter Real Power +  | Netzbezug Zähler (Zähler Wirkleistung(+) gesamt) | Gesamte bezogene Energie (kWh). |
+| Counter Real Power -  | Netzeinspeisung Zähler (Zähler Wirkleistung(-) gesamt) | Gesamte eingespeiste Energie (kWh). |
+
+Je nach Konfiguration werden folgende Werte (als Summe oder pro Phase L1-L3) angelegt:
+- **Wirkleistung (Bezug/Einspeisung)**: Aktueller Verbrauch bzw. Einspeisung in Watt (W).
+- **Zählerstände**: Akkumulierte Energie in Kilowattstunden (kWh).
+- **Netzfrequenz**: Aktuelle Frequenz in Hertz (Hz).
+- **Zusatzwerte**: Optional können Blind- und Scheinleistung sowie Spannung und Stromstärke (pro Phase) aktiviert werden.
+
+Zusätzlich werden Informationsvariablen angelegt:
 - **SW-Version**: Die aktuell installierte Firmware-Version des SMA Gerätes.
 - **Serial Number**: Die eindeutige Seriennummer des Gerätes.
 
@@ -64,7 +79,7 @@ Zusätzlich zu den Messwerten werden folgende Informationsvariablen angelegt:
 
 #### Profile
 
-Es werden keine Profile benutzt.
+Es werden keine globalen Profile angelegt. Das Modul nutzt die ab Symcon 7.0 verfügbaren Darstellungseigenschaften direkt an den Variablen.
 
 ### 6. PHP-Befehlsreferenz
 

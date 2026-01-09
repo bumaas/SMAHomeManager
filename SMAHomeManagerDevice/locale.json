@@ -1,24 +1,32 @@
 {
-    "translations": {
-        "de": {
-            "Serial Number (leave empty for auto-bind)": "Seriennummer (leer lassen für automatische Zuweisung)",
-            "Serial Number": "Seriennummer",
-            "Show more detailed measurement channels (apparent power, reactive power)": "Anzeige detaillierterer Messkanäle (Scheinleistung, Blindleistung)",
-            "Show single phases": "Anzeige einzelner Phasen",
-            "Expert Parameters": "Expertenoptionen",
-            "Extended Update Interval": "Verlängertes Aktualisierungsintervall",
-            "Seconds": "Sekunden",
-            "Extended Debug Information": "Erweiterte Debug Informationen",
-            "Real Power": "Wirkleistung",
-            "Counter Real Power": "Zähler Wirkleistung",
-            "Reactive Power": "Blindleistung",
-            "Counter Reactive Power": "Zähler Blindleistung",
-            "Apparent Power": "Scheinleistung",
-            "Counter Apparent Power": "Zähler Scheinleistung",
-            "Power Factor": "Leistungsfaktor",
-            "Network Frequency": "Netzfrequenz",
-            "Power": "Strom",
-            "Voltage": "Spannung"
-        }
+  "translations": {
+    "de": {
+      "Serial Number (leave empty for auto-bind)":                                "Seriennummer (leer lassen für automatische Zuweisung)",
+      "Serial Number":                                                            "Seriennummer",
+      "Show more detailed measurement channels (apparent power, reactive power)": "Anzeige detaillierterer Messkanäle (Scheinleistung, Blindleistung)",
+      "Show single phases":                                                       "Anzeige einzelner Phasen",
+      "Expert Parameters":                                                        "Expertenoptionen",
+      "Extended Update Interval":                                                 "Verlängertes Aktualisierungsintervall",
+      "Seconds":                                                                  "Sekunden",
+      "Extended Debug Information":                                               "Erweiterte Debug Informationen",
+      "L1":                                                                       "L1",
+      "L2":                                                                       "L2",
+      "L3":                                                                       "L3",
+      "Grid Consumption":                                                         "Netzbezug",
+      "Grid Consumption Counter":                                                 "Netzbezug Zähler",
+      "Grid Feed-In":                                                             "Netzeinspeisung",
+      "Grid Feed-In Counter":                                                     "Netzeinspeisung Zähler",
+      "Real Power":                                                               "Wirkleistung",
+      "Counter Real Power":                                                       "Zähler Wirkleistung",
+      "Reactive Power":                                                           "Blindleistung",
+      "Counter Reactive Power":                                                   "Zähler Blindleistung",
+      "Apparent Power":                                                           "Scheinleistung",
+      "Counter Apparent Power":                                                   "Zähler Scheinleistung",
+      "Power Factor":                                                             "Leistungsfaktor",
+      "Network Frequency":                                                        "Netzfrequenz",
+      "Voltage":                                                                  "Spannung",
+      "Power":                                                                    "Stromstärke",
+      "SW-Version":                                                               "Software Version"
     }
+  }
 }
