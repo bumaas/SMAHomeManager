@@ -81,7 +81,7 @@ Zusätzlich werden Informationsvariablen angelegt:
 
 #### Profile
 
-Es werden keine globalen Profile angelegt. Das Modul nutzt die ab Symcon 7.0 verfügbaren Darstellungseigenschaften direkt an den Variablen.
+Es werden keine globalen Profile angelegt. Das Modul nutzt Darstellungseigenschaften direkt an den Variablen.
 
 ### 6. PHP-Befehlsreferenz
 

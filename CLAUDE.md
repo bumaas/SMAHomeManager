@@ -14,15 +14,15 @@ als Statusvariablen bereitstellt.
 
 ## Protokoll-Verarbeitung (SMA-Net)
 
-- `processData()` zerlegt das Datagramm: 28-Byte-Header (Seriennummer ab Byte 20,
-  Protokoll-ID 0x6069 ab Byte 16), danach OBIS-Datenstrom im Tag-Length-Value-Format;
-  das 3. Byte der OBIS-ID ist die Wertlänge (4 Bytes → `unpack('N')`, 8 Bytes → `unpack('J')`).
+- `processData()` zerlegt das Datagramm: Header-Prüfung (Protokoll-ID, Seriennummer),
+  danach OBIS-Datenstrom im Tag-Length-Value-Format — die byte-genauen Offsets stehen
+  als Kommentare direkt in der Funktion.
 - Die Zuordnung OBIS-ID → Variable liefert `getLookupMap()`: dynamisch aus `MEASUREMENTS`
-  aufgebaut; Einzelphasen entstehen über Typ-Offsets (+20/+40/+60 für L1/L2/L3),
-  Strom/Spannung über Offset +11/+12. Die Map hängt von den Properties ab
+  aufgebaut, Einzelphasen über Typ-Offsets. Die Map hängt von den Properties ab
   (Detail-Kanäle, Einzelphasen) — Registrierung und Empfang nutzen dieselbe Map.
-- Seriennummern-Filter: ohne konfigurierte Seriennummer wird das erste empfangene Gerät
-  übernommen (`SERIAL_NUMBER` wird zur Info gesetzt).
+- Seriennummern-Filter: ohne konfigurierte Seriennummer werden die Pakete aller Geräte
+  verarbeitet (keine Fixierung auf das erste Gerät); `SERIAL_NUMBER` zeigt die zuletzt
+  empfangene Seriennummer.
 - `GetConfigurationForParent()` konfiguriert den Multicast-Socket automatisch —
   Änderungen an Port/Multicast-IP nur dort.
 
