@@ -298,7 +298,7 @@ class SMAHomeManagerDevice extends IPSModuleStrict
     }
 
     /**
-     * Verarbeitet die empfangenen RAW-Daten des SMA Geräts.
+     * Verarbeitet die empfangenen RAW-Daten des SMA-Geräts.
      * Das Paket wird nach dem SMA-Net-Protokoll (Header + OBIS-Datenstrom) zerlegt.
      *
      * @param string $hraw Der Datenstrom vom Multicast-Socket (Hex oder Binär).
@@ -392,7 +392,7 @@ class SMAHomeManagerDevice extends IPSModuleStrict
     }
     private function getIdent(string $prefix, string $name): string
     {
-        // Erzeugt einen gültigen IPS-Ident aus Prefix und Name
+        // Erzeugt einen gültigen IPS-Ident aus Prefix und Namen
         $name = str_replace(['+', '-'], ['pos', 'neg'], $name);
         return $prefix . '_' . preg_replace('/[^a-z0-9_]/i', '_', $name);
     }

@@ -1,7 +1,7 @@
 {
   "translations": {
     "de": {
-      "Serial Number (leave empty for auto-bind)":                                "Seriennummer (leer lassen für automatische Zuweisung)",
+      "Serial Number (leave empty to process the data of all devices)":           "Seriennummer (leer lassen, um die Daten aller Geräte zu verarbeiten)",
       "Serial Number":                                                            "Seriennummer",
       "Show more detailed measurement channels (apparent power, reactive power)": "Anzeige detaillierterer Messkanäle (Scheinleistung, Blindleistung)",
       "Show single phases":                                                       "Anzeige einzelner Phasen",

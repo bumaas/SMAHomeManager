@@ -37,7 +37,7 @@ der [Dokumentation der Instanzen](https://www.symcon.de/service/dokumentation/ko
 
 | Name                                                               | Beschreibung                                                                                                                                                                                                |
 |--------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Seriennummer                                                       | Die Seriennummer des SMA Gerätes. Wenn das Feld leer bleibt, wird das erste empfangene Gerät verwendet.                                                                                                     |
+| Seriennummer                                                       | Die Seriennummer des SMA-Gerätes. Wenn das Feld leer bleibt, werden die Pakete aller empfangenen Geräte verarbeitet — bei mehreren SMA-Geräten im Netzwerk sollte die Seriennummer daher angegeben werden.  |
 | Anzeige detaillierterer Messkanäle (Scheinleistung, Blindleistung) | Legt fest, ob neben der Wirkleistung auch die Blind- und Scheinleistung angezeigt werden soll.                                                                                                              |
 | Anzeige einzelner Phasen                                           | Legt fest, ob zusätzlich zu den Summenwerten auch die Werte der einzelnen Phasen L1, L2 und L3 angezeigt werden sollen.                                                                                     |
 | Verlängertes Aktualisierungsintervall                              | Der Multicast Socket empfängt jede Sekunde die Daten vom Energy Meter. Sollen die Daten weniger häufig verarbeitet werden, so kann das Intervall entsprechend hoch gesetzt werden (0 = keine Verlängerung). |
@@ -60,12 +60,12 @@ beschrieben sind.
 
 Das Modul übersetzt die technischen Messkanäle des SMA-Protokolls automatisch in lesbare Bezeichnungen. Besonders bei den Summenwerten (SUM) werden folgende Spezialbezeichnungen verwendet:
 
-| SMA-Kanal (Protokoll) | Bezeichnung in Symcon (Beispiel) | Beschreibung |
-|-----------------------|-----------------------------------|--------------|
-| Real Power +          | Netzbezug (Wirkleistung(+) gesamt)| Aktuelle Wirkleistung, die vom Netz bezogen wird. |
-| Real Power -          | Netzeinspeisung (Wirkleistung(-) gesamt)| Aktuelle Wirkleistung, die ins Netz eingespeist wird. |
-| Counter Real Power +  | Netzbezug Zähler (Zähler Wirkleistung(+) gesamt) | Gesamte bezogene Energie (kWh). |
-| Counter Real Power -  | Netzeinspeisung Zähler (Zähler Wirkleistung(-) gesamt) | Gesamte eingespeiste Energie (kWh). |
+| SMA-Kanal (Protokoll) | Bezeichnung in Symcon (Beispiel)                       | Beschreibung                                          |
+|-----------------------|--------------------------------------------------------|-------------------------------------------------------|
+| Real Power +          | Netzbezug (Wirkleistung(+) gesamt)                     | Aktuelle Wirkleistung, die vom Netz bezogen wird.     |
+| Real Power -          | Netzeinspeisung (Wirkleistung(-) gesamt)               | Aktuelle Wirkleistung, die ins Netz eingespeist wird. |
+| Counter Real Power +  | Netzbezug Zähler (Zähler Wirkleistung(+) gesamt)       | Gesamte bezogene Energie (kWh).                       |
+| Counter Real Power -  | Netzeinspeisung Zähler (Zähler Wirkleistung(-) gesamt) | Gesamte eingespeiste Energie (kWh).                   |
 
 Je nach Konfiguration werden folgende Werte (als Summe oder pro Phase L1-L3) angelegt:
 - **Wirkleistung (Bezug/Einspeisung)**: Aktueller Verbrauch bzw. Einspeisung in Watt (W).
