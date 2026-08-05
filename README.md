@@ -1,6 +1,8 @@
 # SMA Home Manager Device
 
-Beschreibung des Moduls.
+[![Checks](https://github.com/bumaas/SMAHomeManager/actions/workflows/check.yml/badge.svg)](https://github.com/bumaas/SMAHomeManager/actions/workflows/check.yml)
+
+Das Modul wertet die Multicast-Datagramme eines SMA Energy Meters / Sunny Home Managers 2.0 aus und stellt die Messkanäle als Statusvariablen in IP-Symcon zur Verfügung.
 
 ### Inhaltsverzeichnis
 
@@ -18,7 +20,7 @@ Statusvariablen zur Verfügung.
 
 ### 2. Voraussetzungen
 
-- Symcon ab Version 7.0
+- Symcon ab Version 8.2
 
 ### 3. Software-Installation
 
