@@ -1,6 +1,6 @@
 # SMAHomeManager — Projekt-Hinweise
 
-IP-Symcon-Modul (`IPSModuleStrict`), das die Multicast-Datagramme eines SMA Home Managers /
+Symcon-Modul (`IPSModuleStrict`), das die Multicast-Datagramme eines SMA Home Managers /
 SMA Energy Meters auswertet (UDP-Multicast 239.12.255.254, Port 9522) und die Messkanäle
 als Statusvariablen bereitstellt.
 
