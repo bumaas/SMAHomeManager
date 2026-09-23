@@ -2,7 +2,7 @@
 
 [![Checks](https://github.com/bumaas/SMAHomeManager/actions/workflows/check.yml/badge.svg)](https://github.com/bumaas/SMAHomeManager/actions/workflows/check.yml)
 
-Das Modul wertet die Multicast-Datagramme eines SMA Energy Meters / Sunny Home Managers 2.0 aus und stellt die Messkanäle als Statusvariablen in IP-Symcon zur Verfügung.
+Das Modul wertet die Multicast-Datagramme eines SMA Energy Meters / Sunny Home Managers 2.0 aus und stellt die Messkanäle als Statusvariablen in Symcon zur Verfügung.
 
 ### Inhaltsverzeichnis
 
