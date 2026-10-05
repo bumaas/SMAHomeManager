@@ -10,7 +10,8 @@ als Statusvariablen bereitstellt.
 - `SMAHomeManagerDevice/form.json` — Konfigurationsformular; englische Labels dienen als Übersetzungsschlüssel
 - `SMAHomeManagerDevice/locale.json` — deutsche Übersetzungen
 - `library.json` (Repo-Wurzel) — Version, Build, Datum (Build-Konvention siehe globale CLAUDE.md)
-- `tests/check_locale.php` — Übersetzungs-Vollständigkeitscheck (läuft in der CI)
+- `tests/check_locale.php` — Übersetzungs-Vollständigkeitscheck (läuft in der CI;
+  lokal aus dem Repo-Wurzelverzeichnis: `C:\php\php tests\check_locale.php`)
 
 ## Protokoll-Verarbeitung (SMA-Net)
 
